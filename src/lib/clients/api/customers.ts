@@ -7,6 +7,12 @@ export async function getCustomers() {
     .then((res) => res.data);
 }
 
+export async function getCustomer({ customerId }: { customerId: string }) {
+  return http
+    .get<{ customer: Api.Customer }>(`/customers/${customerId}`)
+    .then((res) => res.data);
+}
+
 export async function getProducts({ customerId }: { customerId: string }) {
   return http
     .get<{ products: Api.Product[] }>(`/customers/${customerId}/products`)
