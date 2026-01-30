@@ -12,9 +12,13 @@ import { Card } from "@/components/ui/card";
 import { api } from "@/lib/clients/api";
 import { useCurrencyFormatter, useMutationAPI } from "@/lib/hooks";
 
-const schema = z.object({
-  products: z.record(z.string(), z.number()),
-});
+const schema = z
+  .object({
+    products: z.record(z.string(), z.number()),
+  })
+  .refine((data) => {
+    return Object.values(data.products).some((quantity) => quantity > 0);
+  });
 type FormValues = z.infer<typeof schema>;
 
 interface CreateOrderProps {
@@ -22,11 +26,13 @@ interface CreateOrderProps {
 }
 
 export default function CreateOrder({ customerId }: CreateOrderProps) {
+  const helpers = [5, 10, 100];
+  const { formatCurrency } = useCurrencyFormatter();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
-  const helpers = [5, 10, 100];
-  const { formatCurrency } = useCurrencyFormatter();
+
+  const { isSubmitting, isValid } = form.formState;
 
   const { data: customer } = useQuery({
     queryKey: ["customers", customerId],
@@ -62,7 +68,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
   const onSubmit = useMutationAPI({
     mutationFn: async (data: FormValues) => {
       console.log("SUBMIT", data);
-      // await api.orders.create({})
+      await api.orders.create({ customerId, ...data });
     },
   });
 
@@ -109,7 +115,12 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                   </span>
                 </div>
               </div>
-              <Button size={"lg"} type={"submit"} className="rounded-full px-4">
+              <Button
+                size={"lg"}
+                type={"submit"}
+                className="rounded-full px-4"
+                disabled={!isValid || isSubmitting}
+              >
                 <span className="font-bold">Salvar</span>
                 <ArrowRightIcon />
               </Button>

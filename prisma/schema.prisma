@@ -24,24 +24,44 @@ model Customer {
 }
 
 model Order {
-  id         String   @id @default(uuid())
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
-  price      Int
-  items      Json
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          String      @id @default(uuid())
+  customer    Customer    @relation(fields: [customerId], references: [id])
+  customerId  String
+  amountTotal Int
+  status      OrderStatus @default(DRAFT)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  items       OrderItem[]
+}
+
+enum OrderStatus {
+  DRAFT
+  APPROVED
+}
+
+model OrderItem {
+  id          String   @id @default(uuid())
+  order       Order    @relation(fields: [orderId], references: [id])
+  orderId     String
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   String
+  price       Int
+  amountTotal Int
+  quantity    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Product {
-  id         String   @id @default(uuid())
+  id         String      @id @default(uuid())
   name       String
   price      Int
   icon       String
-  customer   Customer @relation(fields: [customerId], references: [id])
+  customer   Customer    @relation(fields: [customerId], references: [id])
   customerId String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  orderItems OrderItem[]
 }
 
 model Link {
