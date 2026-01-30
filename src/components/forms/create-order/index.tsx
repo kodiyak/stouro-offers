@@ -67,7 +67,6 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
 
   const onSubmit = useMutationAPI({
     mutationFn: async (data: FormValues) => {
-      console.log("SUBMIT", data);
       await api.orders.create({ customerId, ...data });
     },
   });

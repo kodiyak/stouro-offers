@@ -29,6 +29,7 @@ model Order {
   customerId  String
   amountTotal Int
   status      OrderStatus @default(DRAFT)
+  position    Int         @default(0)
   createdAt   DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
   items       OrderItem[]
@@ -41,10 +42,11 @@ enum OrderStatus {
 
 model OrderItem {
   id          String   @id @default(uuid())
-  order       Order    @relation(fields: [orderId], references: [id])
+  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId     String
-  product     Product  @relation(fields: [productId], references: [id])
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId   String
+  name        String
   price       Int
   amountTotal Int
   quantity    Int

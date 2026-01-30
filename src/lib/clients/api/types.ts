@@ -16,4 +16,27 @@ export namespace Api {
     createdAt: string;
     updatedAt: string;
   }
+
+  export interface Order {
+    id: string;
+    amountTotal: number;
+    position: number;
+    customerId: string;
+    createdAt: string;
+    updatedAt: string;
+    items: Api.OrderItem[];
+    customer: Api.Customer;
+  }
+
+  export interface OrderItem {
+    id: string;
+    orderId: string;
+    name: string;
+    productId: string;
+    quantity: number;
+    price: number;
+    amountTotal: number;
+    createdAt: string;
+    updatedAt: string;
+  }
 }

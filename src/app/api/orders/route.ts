@@ -32,14 +32,16 @@ export async function POST(req: NextRequest) {
     const quantity = data.products[product.id] || 0;
     return product.price * quantity;
   });
-
+  const position = (await db.order.count()) + 1;
   const order = await db.order.create({
     data: {
       customer: { connect: { id: data.customerId } },
       amountTotal,
+      position,
       items: {
         createMany: {
           data: products.map((product) => ({
+            name: product.name,
             productId: product.id,
             amountTotal: product.price * (data.products[product.id] || 0),
             price: product.price,
@@ -48,8 +50,16 @@ export async function POST(req: NextRequest) {
         },
       },
     },
-    include: { items: true },
+    include: { items: true, customer: true },
   });
 
   return Response.json({ order });
+}
+
+export async function GET() {
+  const orders = await db.order.findMany({
+    include: { items: true, customer: true },
+  });
+
+  return Response.json({ orders });
 }
