@@ -18,7 +18,7 @@ export default function FormLayout({
   footer,
 }: PropsWithChildren<FormLayoutProps>) {
   return (
-    <div className="h-screen w-screen flex flex-col">
+    <div className="h-dvh w-dvw overflow-hidden flex flex-col">
       <header className="h-16 border-b flex items-center gap-4">
         <div className="container h-full flex items-center mx-auto px-6">
           {goBack && (
