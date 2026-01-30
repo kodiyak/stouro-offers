@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
 import "./globals.css";
+import QueryProvider from "@/components/providers/query-provider";
+import { cn } from "@/lib/utils";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
@@ -27,9 +29,14 @@ export default function RootLayout({
   return (
     <html lang="en" className={nunitoSans.variable}>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={cn(
+          "dark",
+          geistSans.variable,
+          geistMono.variable,
+          "antialiased",
+        )}
       >
-        {children}
+        <QueryProvider>{children}</QueryProvider>
       </body>
     </html>
   );
