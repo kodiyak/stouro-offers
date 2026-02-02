@@ -1,5 +1,6 @@
 "use client";
 
+import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useQuery } from "@tanstack/react-query";
 import {
   DollarSignIcon,
@@ -20,6 +21,7 @@ import {
 } from "@/lib/hooks";
 import { getOrderPosition } from "@/lib/utils";
 import ListOrderItems from "./list-order-items";
+import OrderDocument from "./order-document";
 import OrderMoreOptions from "./order-more-options";
 
 interface OrderPageProps {
@@ -50,14 +52,22 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         isOverlayed={moreOptions.isOpen}
         footer={
           <div className="grid gap-2.5">
-            <Button
-              size={"drawer"}
-              className="rounded-full"
-              variant={"outline"}
-            >
-              <DownloadIcon className="size-5 mr-2" />
-              <span>Baixar Pedido</span>
-            </Button>
+            {order && (
+              <Button
+                size={"drawer"}
+                className="rounded-full"
+                variant={"outline"}
+                asChild
+              >
+                <PDFDownloadLink
+                  document={<OrderDocument order={order} />}
+                  fileName={`pedido-${getOrderPosition(order?.position ?? 0)}.pdf`}
+                >
+                  <DownloadIcon className="size-5 mr-2" />
+                  <span>Baixar Pedido</span>
+                </PDFDownloadLink>
+              </Button>
+            )}
             <Button
               size={"drawer"}
               className="rounded-full"
@@ -92,17 +102,17 @@ export default function OrderPage({ orderId }: OrderPageProps) {
               </div>
             ))}
           </div>
-          <div className="grid grid-cols gap-2">
-            <Description
-              title={"Data de Criação"}
-              description={order ? formatDate(order?.createdAt) : "..."}
-            />
-          </div>
         </div>
-        <Separator className="my-6" />
-        <div className="flex flex-col">
+        <div className="flex flex-col my-6">
           <ListOrderItems
             items={(order?.items ?? []).filter((item) => item.quantity > 0)}
+          />
+        </div>
+        <Separator />
+        <div className="grid grid-cols gap-2 my-6">
+          <Description
+            title={"Data de Criação"}
+            description={order ? formatDate(order?.createdAt) : "..."}
           />
         </div>
       </AppLayout>
