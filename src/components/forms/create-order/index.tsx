@@ -23,6 +23,7 @@ import {
   useDisclosure,
   useMutationAPI,
 } from "@/lib/hooks";
+import { invalidateQueries } from "@/lib/utils";
 import CreateProduct from "../create-product";
 
 const schema = z
@@ -89,6 +90,14 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
       router.push(`/orders/${order.id}`);
     },
   });
+
+  useEffect(() => {
+    form.reset({ products: {} });
+
+    return () => {
+      invalidateQueries(["customers", customerId, "products"]);
+    };
+  }, []);
 
   useEffect(() => {
     const off = form.subscribe({
