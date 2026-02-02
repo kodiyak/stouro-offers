@@ -1,7 +1,12 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { DollarSignIcon, ShareIcon } from "lucide-react";
+import {
+  DollarSignIcon,
+  DownloadIcon,
+  EllipsisIcon,
+  ShareIcon,
+} from "lucide-react";
 import AppLayout from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Description } from "@/components/ui/description";
@@ -13,14 +18,14 @@ import {
   useDisclosure,
 } from "@/lib/hooks";
 import ListOrderItems from "./list-order-items";
-import ShareOrderDrawer from "./share-order-drawer";
+import OrderMoreOptions from "./order-more-options";
 
 interface OrderPageProps {
   orderId: string;
 }
 
 export default function OrderPage({ orderId }: OrderPageProps) {
-  const share = useDisclosure();
+  const moreOptions = useDisclosure();
 
   const { formatCurrency } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
@@ -33,12 +38,29 @@ export default function OrderPage({ orderId }: OrderPageProps) {
 
   return (
     <>
-      <ShareOrderDrawer {...share} />
+      <OrderMoreOptions {...moreOptions} />
       <AppLayout
         title={`Pedido #000${order?.position ?? 0}`}
         description={`Cliente ${order?.customer.name ?? "..."}`}
         goBack={"/"}
-        isOverlayed={share.isOpen}
+        isOverlayed={moreOptions.isOpen}
+        footer={
+          <div className="grid gap-2.5">
+            <Button size={"lg"} className="rounded-full" variant={"outline"}>
+              <DownloadIcon className="size-5 mr-2" />
+              <span>Baixar Pedido</span>
+            </Button>
+            <Button
+              size={"lg"}
+              className="rounded-full"
+              variant={"secondary"}
+              onClick={moreOptions.onOpen}
+            >
+              <EllipsisIcon className="size-5 mr-2" />
+              <span>Mais Opções</span>
+            </Button>
+          </div>
+        }
       >
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4">
@@ -64,25 +86,9 @@ export default function OrderPage({ orderId }: OrderPageProps) {
             />
           </div>
         </div>
-        <Separator className="my-6 opacity-0" />
+        <Separator className="my-6" />
         <div className="flex flex-col">
           <ListOrderItems items={order?.items ?? []} />
-        </div>
-        <Separator className="my-6 opacity-0" />
-        <div className="flex flex-col gap-2.5">
-          <Button
-            size={"lg"}
-            className="rounded-full"
-            variant={"outline"}
-            onClick={share.onOpen}
-          >
-            <ShareIcon className="size-5" />
-            <span className="text-sm flex-1">Compartilhar Pedido</span>
-          </Button>
-          <Button size={"lg"} className="rounded-full" variant={"secondary"}>
-            <DollarSignIcon className="size-5" />
-            <span className="text-sm flex-1">Gerar Cobrança</span>
-          </Button>
         </div>
       </AppLayout>
     </>

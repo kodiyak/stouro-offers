@@ -10,7 +10,12 @@ export default function Page() {
       title={"Tela Inicial"}
       description="Confira seus pedidos."
       footer={
-        <Button className="w-full" asChild>
+        <Button
+          className="w-full rounded-full"
+          variant={"outline"}
+          size={"lg"}
+          asChild
+        >
           <Link href={"/create"}>
             <PlusIcon />
             <span>Novo Pedido</span>

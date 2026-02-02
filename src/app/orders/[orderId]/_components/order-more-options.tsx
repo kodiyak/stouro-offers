@@ -10,12 +10,12 @@ import {
 } from "@/components/ui/drawer";
 import type { UseDisclosure } from "@/lib/hooks";
 
-interface ShareOrderDrawerProps extends UseDisclosure {}
+interface OrderMoreOptionsProps extends UseDisclosure {}
 
-export default function ShareOrderDrawer({
+export default function OrderMoreOptions({
   isOpen,
   onOpenChange,
-}: ShareOrderDrawerProps) {
+}: OrderMoreOptionsProps) {
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent>
