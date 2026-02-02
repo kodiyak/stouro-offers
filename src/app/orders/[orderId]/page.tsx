@@ -5,9 +5,5 @@ import OrderPage from "./_components/order-page";
 export default async function Page({ params }: PageProps<"/orders/[orderId]">) {
   const { orderId } = await params;
 
-  return (
-    <AppLayout title={"Pedido"}>
-      <OrderPage orderId={orderId} />
-    </AppLayout>
-  );
+  return <OrderPage orderId={orderId} />;
 }

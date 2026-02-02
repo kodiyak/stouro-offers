@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import AppLayout from "@/components/layouts/app-layout";
 import { api } from "@/lib/clients/api";
 import ListOrderItems from "./list-order-items";
 
@@ -17,8 +18,14 @@ export default function OrderPage({ orderId }: OrderPageProps) {
   });
 
   return (
-    <div className="flex flex-col">
-      <ListOrderItems items={order?.items ?? []} />
-    </div>
+    <AppLayout
+      title={`Pedido #000${order?.position ?? 0}`}
+      description={`Cliente ${order?.customer.name ?? "..."}`}
+      goBack={"/"}
+    >
+      <div className="flex flex-col">
+        <ListOrderItems items={order?.items ?? []} />
+      </div>
+    </AppLayout>
   );
 }
