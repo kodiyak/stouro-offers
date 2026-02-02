@@ -1,8 +1,13 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { DollarSignIcon, ShareIcon } from "lucide-react";
 import AppLayout from "@/components/layouts/app-layout";
+import { Button } from "@/components/ui/button";
+import { Description } from "@/components/ui/description";
+import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/clients/api";
+import { useCurrencyFormatter, useDateFormatter } from "@/lib/hooks";
 import ListOrderItems from "./list-order-items";
 
 interface OrderPageProps {
@@ -10,6 +15,8 @@ interface OrderPageProps {
 }
 
 export default function OrderPage({ orderId }: OrderPageProps) {
+  const { formatCurrency } = useCurrencyFormatter();
+  const { formatDate } = useDateFormatter();
   const { data: order } = useQuery({
     queryKey: ["orders", orderId],
     queryFn: async () => {
@@ -23,8 +30,41 @@ export default function OrderPage({ orderId }: OrderPageProps) {
       description={`Cliente ${order?.customer.name ?? "..."}`}
       goBack={"/"}
     >
+      <div className="grid gap-4">
+        <div className="grid grid-cols-2 gap-4">
+          {[
+            { label: "Total", value: formatCurrency(order?.amountTotal ?? 0) },
+            { label: "Status", value: order?.status ?? "..." },
+          ].map((info) => (
+            <div key={info.label} className="p-4 rounded-lg border bg-card">
+              <h3 className="font-medium mb-2">{info.label}</h3>
+              <span className="text-sm text-muted-foreground">
+                {info.value}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols gap-2">
+          <Description
+            title={"Data de Criação"}
+            description={order ? formatDate(order?.createdAt) : "..."}
+          />
+        </div>
+      </div>
+      <Separator className="my-6 opacity-0" />
       <div className="flex flex-col">
         <ListOrderItems items={order?.items ?? []} />
+      </div>
+      <Separator className="my-6 opacity-0" />
+      <div className="flex flex-col gap-2.5">
+        <Button size={"lg"} className="rounded-full" variant={"outline"}>
+          <ShareIcon className="size-5" />
+          <span className="text-sm flex-1">Compartilhar Pedido</span>
+        </Button>
+        <Button size={"lg"} className="rounded-full" variant={"secondary"}>
+          <DollarSignIcon className="size-5" />
+          <span className="text-sm flex-1">Gerar Cobrança</span>
+        </Button>
       </div>
     </AppLayout>
   );

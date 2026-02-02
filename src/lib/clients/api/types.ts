@@ -1,3 +1,5 @@
+import type { OrderStatus } from "@/lib/enums";
+
 export namespace Api {
   export interface Customer {
     id: string;
@@ -20,6 +22,7 @@ export namespace Api {
   export interface Order {
     id: string;
     amountTotal: number;
+    status: OrderStatus;
     position: number;
     customerId: string;
     createdAt: string;
