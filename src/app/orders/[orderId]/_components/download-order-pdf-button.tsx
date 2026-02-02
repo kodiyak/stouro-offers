@@ -1,9 +1,9 @@
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { DownloadIcon } from "lucide-react";
 import { memo } from "react";
+import { APP_CONFIG } from "@/app.config";
 import { Button } from "@/components/ui/button";
 import type { Api } from "@/lib/clients/api/types";
-import { getOrderPosition } from "@/lib/utils";
 import OrderDocument from "./order-document";
 
 interface DownloadOrderPdfButtonProps {
@@ -11,6 +11,7 @@ interface DownloadOrderPdfButtonProps {
 }
 
 function DownloadOrderPdfButton({ order }: DownloadOrderPdfButtonProps) {
+  const id = Date.now();
   return (
     <Button
       size={"drawer"}
@@ -20,7 +21,7 @@ function DownloadOrderPdfButton({ order }: DownloadOrderPdfButtonProps) {
     >
       <PDFDownloadLink
         document={<OrderDocument order={order} />}
-        fileName={`pedido-${getOrderPosition(order?.position ?? 0)}.pdf`}
+        fileName={`${[APP_CONFIG.pdf.filenamePrefix, order.orderNumber, id].join("-")}.pdf`}
       >
         <DownloadIcon className="size-5 mr-2" />
         <span>Baixar Pedido</span>
