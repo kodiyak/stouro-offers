@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { APP_CONFIG } from "@/app.config";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "ZapDireto - Estratégia WhatsApp",
-    short_name: "ZapDireto",
-    description: "Gestão e automação de disparos",
+    name: APP_CONFIG.name,
+    short_name: APP_CONFIG.name,
+    description: APP_CONFIG.description,
     start_url: "/",
     display: "standalone",
     orientation: "portrait",

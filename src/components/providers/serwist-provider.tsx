@@ -16,7 +16,6 @@ export function SerwistProvider({
     setMounted(true);
   }, []);
 
-  // Durante o Prerender/SSR, montamos apenas os filhos sem o Provider do Serwist
   if (!mounted) {
     return <>{children}</>;
   }

@@ -5,6 +5,7 @@ import { SerwistProvider } from "@/components/providers/serwist-provider";
 import { cn } from "@/lib/utils";
 
 import "./globals.css";
+import { APP_CONFIG } from "@/app.config";
 
 const nunitoSans = Nunito_Sans({ variable: "--font-sans" });
 
@@ -19,9 +20,9 @@ const geistMono = Geist_Mono({
 });
 
 const APP_NAME = "PWA App";
-const APP_DEFAULT_TITLE = "My Awesome PWA App";
-const APP_TITLE_TEMPLATE = "%s - PWA App";
-const APP_DESCRIPTION = "Best PWA app in the world!";
+const APP_DEFAULT_TITLE = APP_CONFIG.name;
+const APP_TITLE_TEMPLATE = `%s - ${APP_CONFIG.name}`;
+const APP_DESCRIPTION = APP_CONFIG.description;
 
 export const metadata: Metadata = {
   applicationName: APP_NAME,
@@ -60,7 +61,16 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FFFFFF",
+  themeColor: [
+    {
+      media: "(prefers-color-scheme: light)",
+      color: "#ffffff",
+    },
+    {
+      media: "(prefers-color-scheme: dark)",
+      color: "#1d1d1f",
+    },
+  ],
 };
 
 export default function RootLayout({
