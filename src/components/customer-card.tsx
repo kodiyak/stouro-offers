@@ -27,7 +27,21 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
       </ItemMedia>
       <ItemContent>
         <ItemTitle className="font-bold">{customer.name}</ItemTitle>
-        <ItemDescription>{"5 pedidos"}</ItemDescription>
+        <ItemDescription>
+          <span>
+            {[
+              customer._count.products,
+              customer._count.products === 1 ? "peça" : "peças",
+            ].join(" ")}
+          </span>
+          <span>{" - "}</span>
+          <span>
+            {[
+              customer._count.orders,
+              customer._count.orders === 1 ? "pedido" : "pedidos",
+            ].join(" ")}
+          </span>
+        </ItemDescription>
       </ItemContent>
     </Item>
   );

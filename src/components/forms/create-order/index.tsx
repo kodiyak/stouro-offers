@@ -115,7 +115,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
 
   return (
     <>
-      <CreateProduct {...createProduct} />
+      <CreateProduct customerId={customerId} {...createProduct} />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit((v) => onSubmit.mutateAsync(v))}>
           <FormLayout

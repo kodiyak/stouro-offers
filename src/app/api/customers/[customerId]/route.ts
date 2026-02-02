@@ -12,10 +12,10 @@ export async function GET(
 }
 
 async function getCustomer(customerId: string) {
-  "use cache";
-  cacheLife("hours");
-
   return db.customer.findUnique({
     where: { id: customerId },
+    include: {
+      _count: { select: { orders: true, products: true } },
+    },
   });
 }

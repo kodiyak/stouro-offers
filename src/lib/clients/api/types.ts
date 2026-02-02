@@ -7,6 +7,10 @@ export namespace Api {
     color: string;
     createdAt: string;
     updatedAt: string;
+    _count: {
+      products: number;
+      orders: number;
+    };
   }
 
   export interface Product {

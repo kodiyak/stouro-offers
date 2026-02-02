@@ -1,4 +1,3 @@
-import { cacheLife } from "next/cache";
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/clients/db";
 
@@ -12,8 +11,8 @@ export async function GET(
 }
 
 async function getProducts(customerId: string) {
-  "use cache";
-  cacheLife("hours");
-
-  return db.product.findMany({ where: { customerId } });
+  return db.product.findMany({
+    where: { customerId },
+    orderBy: { createdAt: "asc" },
+  });
 }

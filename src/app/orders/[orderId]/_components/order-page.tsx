@@ -88,7 +88,9 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         </div>
         <Separator className="my-6" />
         <div className="flex flex-col">
-          <ListOrderItems items={order?.items ?? []} />
+          <ListOrderItems
+            items={(order?.items ?? []).filter((item) => item.quantity > 0)}
+          />
         </div>
       </AppLayout>
     </>

@@ -19,6 +19,7 @@
     "@remixicon/react": "^4.9.0",
     "@tanstack/react-query": "^5.90.20",
     "axios": "^1.13.4",
+    "react-currency-input-field": "4.0.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",

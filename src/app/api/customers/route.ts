@@ -7,8 +7,10 @@ export async function GET() {
 }
 
 async function getCustomers() {
-  "use cache";
-  cacheLife("hours");
-
-  return db.customer.findMany();
+  return db.customer.findMany({
+    orderBy: { createdAt: "asc" },
+    include: {
+      _count: { select: { orders: true, products: true } },
+    },
+  });
 }

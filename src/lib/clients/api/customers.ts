@@ -18,3 +18,12 @@ export async function getProducts({ customerId }: { customerId: string }) {
     .get<{ products: Api.Product[] }>(`/customers/${customerId}/products`)
     .then((res) => res.data);
 }
+export async function addProduct(data: {
+  customerId: string;
+  name: string;
+  price: number;
+}) {
+  return http
+    .post<{ product: Api.Product }>(`/products`, data)
+    .then((res) => res.data);
+}
