@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={nunitoSans.variable}>
+    <html lang="pt-BR" className={nunitoSans.variable}>
       <body
         className={cn(
           "dark",

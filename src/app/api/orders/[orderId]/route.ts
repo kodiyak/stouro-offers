@@ -12,9 +12,6 @@ export async function GET(
 }
 
 async function getOrder(orderId: string) {
-  "use cache";
-  cacheLife("hours");
-
   return db.order.findUnique({
     where: { id: orderId },
     include: { items: true, customer: true },

@@ -16,6 +16,7 @@ import {
   useCurrencyFormatter,
   useDateFormatter,
   useDisclosure,
+  useLabels,
 } from "@/lib/hooks";
 import ListOrderItems from "./list-order-items";
 import OrderMoreOptions from "./order-more-options";
@@ -26,6 +27,8 @@ interface OrderPageProps {
 
 export default function OrderPage({ orderId }: OrderPageProps) {
   const moreOptions = useDisclosure();
+
+  const labels = useLabels();
 
   const { formatCurrency } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
@@ -38,7 +41,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
 
   return (
     <>
-      <OrderMoreOptions {...moreOptions} />
+      {order && <OrderMoreOptions order={order} {...moreOptions} />}
       <AppLayout
         title={`Pedido #000${order?.position ?? 0}`}
         description={`Cliente ${order?.customer.name ?? "..."}`}
@@ -69,7 +72,12 @@ export default function OrderPage({ orderId }: OrderPageProps) {
                 label: "Total",
                 value: formatCurrency(order?.amountTotal ?? 0),
               },
-              { label: "Status", value: order?.status ?? "..." },
+              {
+                label: "Status",
+                value: order?.status
+                  ? labels.ORDER_STATUS[order.status].toUpperCase()
+                  : "...",
+              },
             ].map((info) => (
               <div key={info.label} className="p-4 rounded-lg border bg-card">
                 <h3 className="font-medium mb-2">{info.label}</h3>

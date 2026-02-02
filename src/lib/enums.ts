@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const orderStatusEnum = z.enum(["DRAFT", "APPROVED"]);
+export const orderStatusEnum = z.enum(["DRAFT", "PAID", "CANCELLED"]);
 export type OrderStatus = z.infer<typeof orderStatusEnum>;
 
 export const productIconEnum = z.enum(["SHIRT"]);
