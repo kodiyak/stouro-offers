@@ -1,3 +1,4 @@
+import { format, startOfYear } from "date-fns";
 import type { NextRequest } from "next/server";
 import z from "zod";
 import { db } from "@/lib/clients/db";
@@ -31,11 +32,18 @@ export async function POST(req: NextRequest) {
     return product.price * quantity;
   });
   const position = (await db.order.count()) + 1;
+  const now = new Date();
+  const year = format(startOfYear(now), "yyyy");
+  const yearPosition = await db.order.count({
+    where: { createdAt: { gte: startOfYear(now) } },
+  });
+  const orderNumber = [year, String(yearPosition).padStart(5, "0")].join("");
   const order = await db.order.create({
     data: {
       customer: { connect: { id: data.customerId } },
       amountTotal,
       position,
+      orderNumber,
       items: {
         createMany: {
           data: products.map((product) => ({

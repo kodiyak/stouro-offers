@@ -28,6 +28,7 @@ export namespace Api {
     amountTotal: number;
     status: OrderStatus;
     position: number;
+    orderNumber: string;
     customerId: string;
     createdAt: string;
     updatedAt: string;

@@ -83,9 +83,7 @@ export default function OrderDocument({ order }: OrderDocumentProps) {
         </View>
         <View style={styles.section}>
           <View style={styles.card}>
-            <Text style={styles.title}>
-              Pedido {getOrderPosition(order.position)}
-            </Text>
+            <Text style={styles.title}>Pedido {`#${order.orderNumber}`}</Text>
             <Text style={styles.subtitle}>{order.customer.name}</Text>
             {order.items
               .filter((i) => i.quantity > 0)

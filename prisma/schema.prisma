@@ -34,6 +34,7 @@ model Order {
   customer    Customer    @relation(fields: [customerId], references: [id])
   customerId  String
   amountTotal Int
+  orderNumber String      @default("")
   status      OrderStatus @default(DRAFT)
   position    Int         @default(0)
   createdAt   DateTime    @default(now())
