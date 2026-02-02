@@ -14,14 +14,16 @@ datasource db {
 }
 
 model Customer {
-  id        String         @id @default(uuid())
-  name      String
-  color     String
-  status    CustomerStatus @default(ACTIVE)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
-  orders    Order[]
-  products  Product[]
+  id            String         @id @default(uuid())
+  name          String
+  color         String
+  status        CustomerStatus @default(ACTIVE)
+  note          String?        @db.Text
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  orders        Order[]
+  products      Product[]
+  beneficiaries Beneficiary[]
 }
 
 enum CustomerStatus {
@@ -63,21 +65,35 @@ model OrderItem {
 }
 
 model Product {
-  id         String        @id @default(uuid())
-  name       String
-  price      Int
-  icon       String
-  status     ProductStatus @default(ACTIVE)
-  customer   Customer      @relation(fields: [customerId], references: [id])
-  customerId String
-  createdAt  DateTime      @default(now())
-  updatedAt  DateTime      @updatedAt
-  orderItems OrderItem[]
+  id            String        @id @default(uuid())
+  name          String
+  price         Int
+  icon          String
+  status        ProductStatus @default(ACTIVE)
+  customer      Customer      @relation(fields: [customerId], references: [id])
+  customerId    String
+  beneficiary   Beneficiary?  @relation(fields: [beneficiaryId], references: [id])
+  beneficiaryId String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  orderItems    OrderItem[]
 }
 
 enum ProductStatus {
   ACTIVE
   INACTIVE
+}
+
+model Beneficiary {
+  id         String    @id @default(uuid())
+  name       String
+  customer   Customer  @relation(fields: [customerId], references: [id])
+  customerId String
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  products   Product[]
+
+  @@map("Beneficiary")
 }
 
 model Link {

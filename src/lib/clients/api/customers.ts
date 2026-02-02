@@ -18,6 +18,15 @@ export async function getProducts({ customerId }: { customerId: string }) {
     .get<{ products: Api.Product[] }>(`/customers/${customerId}/products`)
     .then((res) => res.data);
 }
+
+export async function getBeneficiaries({ customerId }: { customerId: string }) {
+  return http
+    .get<{ beneficiaries: Api.Beneficiary[] }>(
+      `/customers/${customerId}/beneficiaries`,
+    )
+    .then((res) => res.data);
+}
+
 export async function addProduct(data: {
   customerId: string;
   name: string;
@@ -31,5 +40,17 @@ export async function addProduct(data: {
 export async function create(data: { name: string; color: string }) {
   return http
     .post<{ customer: Api.Customer }>(`/customers`, data)
+    .then((res) => res.data);
+}
+
+export async function createBeneficiary(data: {
+  customerId: string;
+  name: string;
+}) {
+  return http
+    .post<{ beneficiary: Api.Beneficiary }>(
+      `/customers/${data.customerId}/beneficiaries`,
+      { name: data.name },
+    )
     .then((res) => res.data);
 }

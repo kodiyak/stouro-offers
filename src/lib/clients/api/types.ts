@@ -47,4 +47,12 @@ export namespace Api {
     createdAt: string;
     updatedAt: string;
   }
+
+  export interface Beneficiary {
+    id: string;
+    name: string;
+    customerId: string;
+    createdAt: string;
+    updatedAt: string;
+  }
 }
