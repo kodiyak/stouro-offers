@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
   const body = schema.safeParse(await req.json());
 
   if (body.error) {
-    return Response.json({ error: z.treeifyError(body.error) }, { status: 400 });
+    return Response.json(
+      { error: z.treeifyError(body.error) },
+      { status: 400 },
+    );
   }
 
   const { data } = body;
@@ -35,7 +38,12 @@ async function getCustomers() {
     where: { status: "ACTIVE" },
     orderBy: { createdAt: "asc" },
     include: {
-      _count: { select: { orders: true, products: true } },
+      _count: {
+        select: {
+          orders: { where: { status: { not: "CANCELLED" } } },
+          products: { where: { status: "ACTIVE" } },
+        },
+      },
     },
   });
 }
