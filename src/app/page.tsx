@@ -1,9 +1,23 @@
+import { PlusIcon } from "lucide-react";
+import Link from "next/link";
 import AppLayout from "@/components/layouts/app-layout";
+import { Button } from "@/components/ui/button";
 import ListOrders from "./_components/list-orders";
 
 export default function Page() {
   return (
-    <AppLayout title={"Tela Inicial"}>
+    <AppLayout
+      title={"Tela Inicial"}
+      description="Confira seus pedidos."
+      footer={
+        <Button className="w-full" asChild>
+          <Link href={"/create"}>
+            <PlusIcon />
+            <span>Novo Pedido</span>
+          </Link>
+        </Button>
+      }
+    >
       <div className="flex flex-col gap-8 py-6">
         <ListOrders />
       </div>

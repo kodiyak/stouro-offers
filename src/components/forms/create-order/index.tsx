@@ -3,6 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRightIcon, MinusIcon, PlusIcon, ShirtIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import z from "zod";
@@ -28,6 +29,7 @@ interface CreateOrderProps {
 export default function CreateOrder({ customerId }: CreateOrderProps) {
   const helpers = [5, 10, 100];
   const { formatCurrency } = useCurrencyFormatter();
+  const router = useRouter();
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
   });
@@ -67,7 +69,10 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
 
   const onSubmit = useMutationAPI({
     mutationFn: async (data: FormValues) => {
-      await api.orders.create({ customerId, ...data });
+      return api.orders.create({ customerId, ...data });
+    },
+    onSuccess: async ({ order }) => {
+      router.push(`/orders/${order.id}`);
     },
   });
 

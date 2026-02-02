@@ -15,7 +15,8 @@ export default function Page() {
   return (
     <AppLayout
       title={"Novo Pedido"}
-      description="Selecione o cliente para iniciar a contagem."
+      description="Selecione o cliente para continuar."
+      goBack={"/"}
     >
       <div className="grid grid-cols-2 gap-4">
         {customers.map((customer) => (

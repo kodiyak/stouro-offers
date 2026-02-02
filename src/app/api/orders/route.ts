@@ -59,6 +59,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   const orders = await db.order.findMany({
     include: { items: true, customer: true },
+    orderBy: { position: "desc" },
   });
 
   return Response.json({ orders });
