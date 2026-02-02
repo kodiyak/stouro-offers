@@ -46,7 +46,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
     <>
       {order && <OrderMoreOptions order={order} {...moreOptions} />}
       <AppLayout
-        title={`Pedido ${getOrderPosition(order?.position ?? 0)}`}
+        title={`Pedido ${order ? `#${order.orderNumber}` : "..."}`}
         description={order?.customer.name ?? "..."}
         goBack={"/"}
         isOverlayed={moreOptions.isOpen}
