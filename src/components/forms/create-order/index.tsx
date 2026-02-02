@@ -2,7 +2,13 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRightIcon, MinusIcon, PlusIcon, ShirtIcon } from "lucide-react";
+import {
+  ArrowRightIcon,
+  MinusIcon,
+  PlusCircleIcon,
+  PlusIcon,
+  ShirtIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
@@ -10,8 +16,14 @@ import z from "zod";
 import FormLayout from "@/components/layouts/form-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/clients/api";
-import { useCurrencyFormatter, useMutationAPI } from "@/lib/hooks";
+import {
+  useCurrencyFormatter,
+  useDisclosure,
+  useMutationAPI,
+} from "@/lib/hooks";
+import CreateProduct from "../create-product";
 
 const schema = z
   .object({
@@ -28,6 +40,8 @@ interface CreateOrderProps {
 
 export default function CreateOrder({ customerId }: CreateOrderProps) {
   const helpers = [5, 10, 100];
+  const createProduct = useDisclosure();
+
   const { formatCurrency } = useCurrencyFormatter();
   const router = useRouter();
   const form = useForm<FormValues>({
@@ -100,123 +114,140 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
   }, [form, products]);
 
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit((v) => onSubmit.mutateAsync(v))}>
-        <FormLayout
-          title={customer?.name ?? "..."}
-          description={"Criar novo pedido"}
-          goBack="/create"
-          footer={
-            <div className="border-t py-2 px-4 flex items-center">
-              <div className="flex flex-col flex-1 gap-1">
-                <span className="text-xs text-muted-foreground">Total</span>
-                <div className="flex gap-2 items-end">
-                  <span className="text-xl font-black leading-none font-mono">
-                    {formatCurrency(total)}
-                  </span>
-                  <span className="text-xs text-muted-foreground">
-                    ({quantity} peças)
-                  </span>
+    <>
+      <CreateProduct {...createProduct} />
+      <FormProvider {...form}>
+        <form onSubmit={form.handleSubmit((v) => onSubmit.mutateAsync(v))}>
+          <FormLayout
+            title={customer?.name ?? "..."}
+            description={"Criar novo pedido"}
+            goBack="/create"
+            isOverlayed={createProduct.isOpen}
+            footer={
+              <div className="border-t py-2 px-4 flex items-center">
+                <div className="flex flex-col flex-1 gap-1">
+                  <span className="text-xs text-muted-foreground">Total</span>
+                  <div className="flex gap-2 items-end">
+                    <span className="text-xl font-black leading-none font-mono">
+                      {formatCurrency(total)}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      ({quantity} peças)
+                    </span>
+                  </div>
                 </div>
+                <Button
+                  size={"lg"}
+                  type={"submit"}
+                  className="rounded-full px-4"
+                  disabled={!isValid || isSubmitting}
+                >
+                  <span className="font-bold">Salvar</span>
+                  <ArrowRightIcon />
+                </Button>
               </div>
-              <Button
-                size={"lg"}
-                type={"submit"}
-                className="rounded-full px-4"
-                disabled={!isValid || isSubmitting}
-              >
-                <span className="font-bold">Salvar</span>
-                <ArrowRightIcon />
-              </Button>
-            </div>
-          }
-        >
-          <div className="flex flex-col gap-4 py-6">
-            {products.map((product) => (
-              <Controller
-                key={product.id}
-                name={`products.${product.id}`}
-                render={({ field }) => (
-                  <Card className="py-4">
-                    <div className="flex items-center gap-2 px-4">
-                      <ShirtIcon className="size-6" />
-                      <div className="flex flex-col flex-1">
-                        <span className="text-sm font-bold">
-                          {product.name}
-                        </span>
-                        <span className="text-xs font-medium text-muted-foreground">
-                          {formatCurrency(product.price)} /un
+            }
+          >
+            <div className="flex flex-col gap-4 py-6">
+              {products.map((product) => (
+                <Controller
+                  key={product.id}
+                  name={`products.${product.id}`}
+                  render={({ field }) => (
+                    <Card className="py-4">
+                      <div className="flex items-center gap-2 px-4">
+                        <ShirtIcon className="size-6" />
+                        <div className="flex flex-col flex-1">
+                          <span className="text-sm font-bold">
+                            {product.name}
+                          </span>
+                          <span className="text-xs font-medium text-muted-foreground">
+                            {formatCurrency(product.price)} /un
+                          </span>
+                        </div>
+                        <span className="font-mono">
+                          {formatCurrency(product.price * field.value)}
                         </span>
                       </div>
-                      <span className="font-mono">
-                        {formatCurrency(product.price * field.value)}
-                      </span>
-                    </div>
-                    <div className="p-4 flex items-center justify-center">
-                      <span className="text-5xl font-black">{field.value}</span>
-                    </div>
-                    <div className="grid grid-cols-4 gap-2 px-4">
-                      {[
-                        {
-                          icon: <PlusIcon />,
-                          onClick: () => {
-                            field.onChange(field.value + 1);
+                      <div className="p-4 flex items-center justify-center">
+                        <span className="text-5xl font-black">
+                          {field.value}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-4 gap-2 px-4">
+                        {[
+                          {
+                            icon: <PlusIcon />,
+                            onClick: () => {
+                              field.onChange(field.value + 1);
+                            },
                           },
-                        },
-                        ...helpers.map((increment) => ({
-                          icon: (
-                            <>
-                              <PlusIcon />
-                              <span className="text-lg font-bold">
-                                {increment}
-                              </span>
-                            </>
-                          ),
-                          onClick: () => {
-                            field.onChange(field.value + increment);
+                          ...helpers.map((increment) => ({
+                            icon: (
+                              <>
+                                <PlusIcon />
+                                <span className="text-lg font-bold">
+                                  {increment}
+                                </span>
+                              </>
+                            ),
+                            onClick: () => {
+                              field.onChange(field.value + increment);
+                            },
+                          })),
+                          {
+                            icon: <MinusIcon />,
+                            onClick: () => {
+                              field.onChange(Math.max(0, field.value - 1));
+                            },
+                            disabled: field.value < 1,
                           },
-                        })),
-                        {
-                          icon: <MinusIcon />,
-                          onClick: () => {
-                            field.onChange(Math.max(0, field.value - 1));
-                          },
-                          disabled: field.value < 1,
-                        },
-                        ...helpers.map((decrement) => ({
-                          icon: (
-                            <>
-                              <MinusIcon />
-                              <span className="text-lg font-bold">
-                                {decrement}
-                              </span>
-                            </>
-                          ),
-                          onClick: () => {
-                            field.onChange(
-                              Math.max(0, field.value - decrement),
-                            );
-                          },
-                          disabled: field.value < decrement,
-                        })),
-                      ].map(({ icon, onClick, ...rest }, index) => (
-                        <Button
-                          key={index}
-                          variant={"outline"}
-                          onClick={onClick}
-                          {...rest}
-                        >
-                          {icon}
-                        </Button>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-              />
-            ))}
-          </div>
-        </FormLayout>
-      </form>
-    </FormProvider>
+                          ...helpers.map((decrement) => ({
+                            icon: (
+                              <>
+                                <MinusIcon />
+                                <span className="text-lg font-bold">
+                                  {decrement}
+                                </span>
+                              </>
+                            ),
+                            onClick: () => {
+                              field.onChange(
+                                Math.max(0, field.value - decrement),
+                              );
+                            },
+                            disabled: field.value < decrement,
+                          })),
+                        ].map(({ icon, onClick, ...rest }, index) => (
+                          <Button
+                            key={index}
+                            variant={"outline"}
+                            onClick={onClick}
+                            {...rest}
+                          >
+                            {icon}
+                          </Button>
+                        ))}
+                      </div>
+                    </Card>
+                  )}
+                />
+              ))}
+              <Separator />
+              <button
+                type={"button"}
+                className="p-2 rounded-xl text-muted-foreground border-2 bg-card border-dashed aspect-video flex flex-col items-center justify-center gap-4"
+                onClick={createProduct.onOpen}
+              >
+                <PlusCircleIcon className="size-12" />
+                <span className="text-lg font-bold">
+                  Adicionar novo produto
+                </span>
+              </button>
+            </div>
+          </FormLayout>
+        </form>
+      </FormProvider>
+    </>
   );
 }
