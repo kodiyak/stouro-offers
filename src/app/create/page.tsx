@@ -24,6 +24,7 @@ export default function Page() {
         title={"Novo Pedido"}
         description="Selecione o cliente para continuar."
         goBack={"/"}
+        isOverlayed={create.isOpen}
         footer={
           <Button size={"drawer"} variant={"outline"} onClick={create.onOpen}>
             <PlusIcon />

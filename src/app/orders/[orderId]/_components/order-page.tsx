@@ -50,12 +50,16 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         isOverlayed={moreOptions.isOpen}
         footer={
           <div className="grid gap-2.5">
-            <Button size={"lg"} className="rounded-full" variant={"outline"}>
+            <Button
+              size={"drawer"}
+              className="rounded-full"
+              variant={"outline"}
+            >
               <DownloadIcon className="size-5 mr-2" />
               <span>Baixar Pedido</span>
             </Button>
             <Button
-              size={"lg"}
+              size={"drawer"}
               className="rounded-full"
               variant={"secondary"}
               onClick={moreOptions.onOpen}
