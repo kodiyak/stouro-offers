@@ -13,7 +13,7 @@ export default function Page() {
         <Button
           className="w-full rounded-full"
           variant={"outline"}
-          size={"lg"}
+          size={"drawer"}
           asChild
         >
           <Link href={"/create"}>

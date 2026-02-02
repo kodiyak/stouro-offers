@@ -156,12 +156,12 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                   render={({ field }) => (
                     <Card className="py-4">
                       <div className="flex items-center gap-2 px-4">
-                        <ShirtIcon className="size-6" />
+                        <ShirtIcon className="size-6 mr-2 self-start relative top-1" />
                         <div className="flex flex-col flex-1">
-                          <span className="text-sm font-bold">
+                          <span className="text-xl font-bold">
                             {product.name}
                           </span>
-                          <span className="text-xs font-medium text-muted-foreground">
+                          <span className="text-sm font-bold text-muted-foreground">
                             {formatCurrency(product.price)} /un
                           </span>
                         </div>

@@ -27,3 +27,9 @@ export async function addProduct(data: {
     .post<{ product: Api.Product }>(`/products`, data)
     .then((res) => res.data);
 }
+
+export async function create(data: { name: string; color: string }) {
+  return http
+    .post<{ customer: Api.Customer }>(`/customers`, data)
+    .then((res) => res.data);
+}

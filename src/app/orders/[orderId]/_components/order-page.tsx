@@ -18,6 +18,7 @@ import {
   useDisclosure,
   useLabels,
 } from "@/lib/hooks";
+import { getOrderPosition } from "@/lib/utils";
 import ListOrderItems from "./list-order-items";
 import OrderMoreOptions from "./order-more-options";
 
@@ -43,8 +44,8 @@ export default function OrderPage({ orderId }: OrderPageProps) {
     <>
       {order && <OrderMoreOptions order={order} {...moreOptions} />}
       <AppLayout
-        title={`Pedido #000${order?.position ?? 0}`}
-        description={`Cliente ${order?.customer.name ?? "..."}`}
+        title={`Pedido ${getOrderPosition(order?.position ?? 0)}`}
+        description={order?.customer.name ?? "..."}
         goBack={"/"}
         isOverlayed={moreOptions.isOpen}
         footer={
