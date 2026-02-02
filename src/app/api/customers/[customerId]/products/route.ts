@@ -12,7 +12,7 @@ export async function GET(
 
 async function getProducts(customerId: string) {
   return db.product.findMany({
-    where: { customerId },
+    where: { customerId, status: "ACTIVE" },
     orderBy: { createdAt: "asc" },
   });
 }

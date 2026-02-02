@@ -14,13 +14,19 @@ datasource db {
 }
 
 model Customer {
-  id        String    @id @default(uuid())
+  id        String         @id @default(uuid())
   name      String
   color     String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  status    CustomerStatus @default(ACTIVE)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
   orders    Order[]
   products  Product[]
+}
+
+enum CustomerStatus {
+  ACTIVE
+  INACTIVE
 }
 
 model Order {
@@ -37,7 +43,8 @@ model Order {
 
 enum OrderStatus {
   DRAFT
-  APPROVED
+  CANCELLED
+  PAID
 }
 
 model OrderItem {
@@ -55,15 +62,21 @@ model OrderItem {
 }
 
 model Product {
-  id         String      @id @default(uuid())
+  id         String        @id @default(uuid())
   name       String
   price      Int
   icon       String
-  customer   Customer    @relation(fields: [customerId], references: [id])
+  status     ProductStatus @default(ACTIVE)
+  customer   Customer      @relation(fields: [customerId], references: [id])
   customerId String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
   orderItems OrderItem[]
+}
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
 }
 
 model Link {

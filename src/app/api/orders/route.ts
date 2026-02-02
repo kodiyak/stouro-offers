@@ -11,8 +11,6 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const body = schema.safeParse(await req.json());
 
-  console.log(body);
-
   if (body.error) {
     return Response.json(
       { error: z.treeifyError(body.error) },
@@ -58,6 +56,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   const orders = await db.order.findMany({
+    where: { status: { notIn: ["CANCELLED"] } },
     include: { items: true, customer: true },
     orderBy: { position: "desc" },
   });

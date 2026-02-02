@@ -8,6 +8,7 @@ export async function GET() {
 
 async function getCustomers() {
   return db.customer.findMany({
+    where: { status: "ACTIVE" },
     orderBy: { createdAt: "asc" },
     include: {
       _count: { select: { orders: true, products: true } },
