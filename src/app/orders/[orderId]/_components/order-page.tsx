@@ -20,8 +20,8 @@ import {
   useLabels,
 } from "@/lib/hooks";
 import { getOrderPosition } from "@/lib/utils";
+import DownloadOrderPdfButton from "./download-order-pdf-button";
 import ListOrderItems from "./list-order-items";
-import OrderDocument from "./order-document";
 import OrderMoreOptions from "./order-more-options";
 
 interface OrderPageProps {
@@ -52,22 +52,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         isOverlayed={moreOptions.isOpen}
         footer={
           <div className="grid gap-2.5">
-            {order && (
-              <Button
-                size={"drawer"}
-                className="rounded-full"
-                variant={"outline"}
-                asChild
-              >
-                <PDFDownloadLink
-                  document={<OrderDocument order={order} />}
-                  fileName={`pedido-${getOrderPosition(order?.position ?? 0)}.pdf`}
-                >
-                  <DownloadIcon className="size-5 mr-2" />
-                  <span>Baixar Pedido</span>
-                </PDFDownloadLink>
-              </Button>
-            )}
+            {order && <DownloadOrderPdfButton order={order} />}
             <Button
               size={"drawer"}
               className="rounded-full"

@@ -6,7 +6,7 @@ import {
   Text,
   View,
 } from "@react-pdf/renderer";
-import Logo from "@/assets/logo.png";
+import Logo from "@/assets/logo_pdf.png";
 import type { Api } from "@/lib/clients/api/types";
 import { useCurrencyFormatter } from "@/lib/hooks";
 import { getOrderPosition } from "@/lib/utils";
