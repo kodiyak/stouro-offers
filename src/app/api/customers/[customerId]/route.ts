@@ -1,4 +1,3 @@
-import { cacheLife } from "next/cache";
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/clients/db";
 
@@ -15,7 +14,12 @@ async function getCustomer(customerId: string) {
   return db.customer.findUnique({
     where: { id: customerId },
     include: {
-      _count: { select: { orders: true, products: true } },
+      _count: {
+        select: {
+          orders: { where: { status: { not: "CANCELLED" } } },
+          products: { where: { status: "ACTIVE" } },
+        },
+      },
     },
   });
 }
