@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbo",
     "build": "next build",
     "start": "next start",
     "lint": "biome check",
@@ -45,12 +45,16 @@
   "devDependencies": {
     "@biomejs/biome": "2.2.0",
     "@faker-js/faker": "^10.2.0",
+    "@serwist/turbopack": "^9.5.3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/pg": "^8.16.0",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "esbuild": "^0.27.2",
+    "esbuild-wasm": "^0.27.2",
     "prisma": "^7.3.0",
+    "serwist": "^9.5.3",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5"

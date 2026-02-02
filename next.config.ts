@@ -1,3 +1,4 @@
+import { withSerwist } from "@serwist/turbopack";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -6,6 +7,7 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [new URL("https://avatar.vercel.sh/**")],
   },
+  serverExternalPackages: ["@serwist/turbopack", "esbuild-wasm"],
 };
 
-export default nextConfig;
+export default withSerwist(nextConfig);
