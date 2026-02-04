@@ -44,3 +44,10 @@ export async function signedUrl({ path, expiresIn }: SignedUrlProps) {
   const url = await getSignedUrl(s3, command, { expiresIn }).catch(() => null);
   return url;
 }
+
+interface PublicUrlProps {
+  path: string;
+}
+export function publicUrl({ path }: PublicUrlProps) {
+  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}${path}`;
+}

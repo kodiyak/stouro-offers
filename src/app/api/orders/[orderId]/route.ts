@@ -1,4 +1,3 @@
-import { cacheLife } from "next/cache";
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/clients/db";
 

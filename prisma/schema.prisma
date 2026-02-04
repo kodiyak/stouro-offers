@@ -44,6 +44,8 @@ model Order {
   createdAt   DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime    @updatedAt @db.Timestamptz(3)
   items       OrderItem[]
+  manifest    Manifest?   @relation(fields: [manifestId], references: [id])
+  manifestId  String?     @unique
 }
 
 enum OrderStatus {
@@ -126,13 +128,26 @@ model Transaction {
 }
 
 model Manifest {
-  id             String   @id @default(uuid())
-  customer       Customer @relation(fields: [customerId], references: [id])
-  customerId     String
+  id             String         @id @default(uuid())
+  customer       Customer?      @relation(fields: [customerId], references: [id])
+  customerId     String?
+  order          Order?
+  fileUrl        String?
+  fileType       String?
+  fileSize       Int?
+  documentType   String
   manifestNumber String
-  payload        Json     @db.JsonB
-  createdAt      DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
+  payload        Json           @db.JsonB
+  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
+  status         ManifestStatus @default(PENDING_REVIEW)
+}
+
+enum ManifestStatus {
+  PENDING_REVIEW
+  APPROVED
+  CONVERTED
+  REJECTED
 }
 
 model Link {

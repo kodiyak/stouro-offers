@@ -55,4 +55,17 @@ export namespace Api {
     createdAt: string;
     updatedAt: string;
   }
+
+  export interface Manifest {
+    id: string;
+    customerId?: string | null;
+    fileUrl?: string | null;
+    fileType?: string | null;
+    fileSize?: number | null;
+    documentType: string;
+    manifestNumber: string;
+    payload: any;
+    createdAt: string;
+    updatedAt: string;
+  }
 }
