@@ -19,11 +19,13 @@ model Customer {
   color         String
   status        CustomerStatus @default(ACTIVE)
   note          String?        @db.Text
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
+  createdAt     DateTime       @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime       @updatedAt @db.Timestamptz(3)
   orders        Order[]
   products      Product[]
   beneficiaries Beneficiary[]
+  payments      Payment[]
+  manifests     Manifest[]
 }
 
 enum CustomerStatus {
@@ -39,8 +41,8 @@ model Order {
   orderNumber String      @default("")
   status      OrderStatus @default(DRAFT)
   position    Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
+  createdAt   DateTime    @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime    @updatedAt @db.Timestamptz(3)
   items       OrderItem[]
 }
 
@@ -60,8 +62,8 @@ model OrderItem {
   price       Int
   amountTotal Int
   quantity    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Product {
@@ -74,8 +76,8 @@ model Product {
   customerId    String
   beneficiary   Beneficiary?  @relation(fields: [beneficiaryId], references: [id])
   beneficiaryId String?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  createdAt     DateTime      @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime      @updatedAt @db.Timestamptz(3)
   orderItems    OrderItem[]
 }
 
@@ -89,11 +91,48 @@ model Beneficiary {
   name       String
   customer   Customer  @relation(fields: [customerId], references: [id])
   customerId String
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime  @updatedAt @db.Timestamptz(3)
   products   Product[]
 
   @@map("Beneficiary")
+}
+
+model Payment {
+  id            String   @id @default(uuid())
+  customer      Customer @relation(fields: [customerId], references: [id])
+  customerId    String
+  amount        Int
+  paymentMethod String
+  metadata      Json     @db.JsonB
+  createdAt     DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(3)
+}
+
+/**
+ * Objetivos:
+ * - Saber quanto foi recebido de determinado cliente
+ * - Saber quanto falta receber de determinado cliente
+ * - Precisamos também, mesclar pedidos
+ */
+model Transaction {
+  id         String   @id @default(uuid())
+  amount     Int
+  targetType String
+  targetId   String
+  payload    Json     @db.JsonB
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model Manifest {
+  id             String   @id @default(uuid())
+  customer       Customer @relation(fields: [customerId], references: [id])
+  customerId     String
+  manifestNumber String
+  payload        Json     @db.JsonB
+  createdAt      DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt      DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Link {
@@ -101,6 +140,6 @@ model Link {
   token      String   @unique
   targetType String
   targetId   String
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt  DateTime @updatedAt @db.Timestamptz(3)
 }
