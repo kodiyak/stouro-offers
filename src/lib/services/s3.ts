@@ -49,5 +49,5 @@ interface PublicUrlProps {
   path: string;
 }
 export function publicUrl({ path }: PublicUrlProps) {
-  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}${path}`;
+  return `${process.env.S3_ENDPOINT}/${process.env.S3_BUCKET_NAME}/${path}`;
 }
