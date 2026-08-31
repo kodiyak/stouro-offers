@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Nunito_Sans } from "next/font/google";
+import { OverlayedProvider } from "@/components/providers/overlayed-provider";
 import QueryProvider from "@/components/providers/query-provider";
 import { SerwistProvider } from "@/components/providers/serwist-provider";
 import { cn } from "@/lib/utils";
@@ -89,7 +90,9 @@ export default function RootLayout({
         )}
       >
         <QueryProvider>
-          <SerwistProvider swUrl="/serwist/sw.js">{children}</SerwistProvider>
+          <OverlayedProvider>
+            <SerwistProvider swUrl="/serwist/sw.js">{children}</SerwistProvider>
+          </OverlayedProvider>
         </QueryProvider>
       </body>
     </html>

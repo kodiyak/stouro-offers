@@ -1,4 +1,5 @@
 import { DollarSignIcon, HistoryIcon, TrashIcon } from "lucide-react";
+import { useOverlayedActive } from "@/components/providers/overlayed-provider";
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
@@ -24,6 +25,7 @@ export default function OrderMoreOptions({
   onClose,
   order,
 }: OrderMoreOptionsProps) {
+  useOverlayedActive(isOpen);
   const restore = useMutationAPI({
     mutationFn: async () => api.orders.restore({ orderId: order.id }),
     onSuccess: async () => {

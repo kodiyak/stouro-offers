@@ -5,6 +5,7 @@ import { PlusIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
+import { useOverlayedActive } from "@/components/providers/overlayed-provider";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import {
@@ -50,6 +51,7 @@ export default function CreateProduct({
   onClose,
   customerId,
 }: CreateProductProps) {
+  useOverlayedActive(isOpen);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema) as never,
   });

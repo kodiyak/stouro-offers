@@ -131,7 +131,6 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
             title={customer?.name ?? "..."}
             description={"Criar novo pedido"}
             goBack="/create"
-            isOverlayed={createProduct.isOpen}
             footer={
               <div className="border-t py-2 px-4 flex items-center">
                 <div className="flex flex-col flex-1 gap-1">

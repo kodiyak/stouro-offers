@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, PlusIcon } from "lucide-react";
 import AppLayout from "@/components/layouts/app-layout";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Description } from "@/components/ui/description";
 import { Separator } from "@/components/ui/separator";
@@ -46,13 +47,31 @@ export default function OrderPage({ orderId }: OrderPageProps) {
       {order && <AddManifestDrawer orderId={orderId} {...addManifest} />}
       <AppLayout
         title={`Pedido ${order ? `#${order.orderNumber}` : "..."}`}
-        description={order?.customer.name ?? "..."}
+        description={
+          <div className="flex items-center gap-2">
+            <span className="text-base text-muted-foreground">
+              {order?.customer.name ?? "..."}
+            </span>
+            <Badge className="ml-auto" variant={"secondary"}>
+              {labels.ORDER_STATUS[order?.status ?? "DRAFT"].toUpperCase()}
+            </Badge>
+          </div>
+        }
         goBack={"/"}
-        isOverlayed={moreOptions.isOpen || addManifest.isOpen}
         footer={
           <div className="flex flex-col gap-2">
+            <div className="flex flex-col items-end gap-1">
+              <span className="text-sm text-muted-foreground font-mono font-bold">
+                Total
+              </span>
+              <span className="text-3xl font-extrabold font-mono text-right">
+                {order ? formatCurrency(order.amountTotal) : "..."}
+              </span>
+            </div>
             <div className="flex items-center gap-2">
-              {order && <DownloadOrderPdfButton order={order} />}
+              {order && (
+                <DownloadOrderPdfButton key={order?.updatedAt} order={order} />
+              )}
               <Button
                 size={"icon-lg"}
                 className="rounded-full"
@@ -65,30 +84,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
           </div>
         }
       >
-        <div className="grid gap-4">
-          <div className="grid grid-cols-2 gap-4">
-            {[
-              {
-                label: "Total",
-                value: formatCurrency(order?.amountTotal ?? 0),
-              },
-              {
-                label: "Status",
-                value: order?.status
-                  ? labels.ORDER_STATUS[order.status].toUpperCase()
-                  : "...",
-              },
-            ].map((info) => (
-              <div key={info.label} className="p-4 rounded-lg border bg-card">
-                <h3 className="font-medium mb-2">{info.label}</h3>
-                <span className="text-sm text-muted-foreground">
-                  {info.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="flex flex-col my-6">
+        <div className="flex flex-col">
           {order && (
             <ListOrderItems
               items={order.items.filter((item) => item.quantity > 0)}
@@ -98,7 +94,8 @@ export default function OrderPage({ orderId }: OrderPageProps) {
             />
           )}
         </div>
-        <div className="flex flex-col gap-2 my-6">
+        <Separator className="my-8" />
+        <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">Romaneios</h3>
             <Button
@@ -113,8 +110,8 @@ export default function OrderPage({ orderId }: OrderPageProps) {
           </div>
           <ListManifests manifests={order?.manifests ?? []} />
         </div>
-        <Separator />
-        <div className="grid grid-cols gap-2 my-6">
+        <Separator className="my-8" />
+        <div className="grid grid-cols gap-2">
           <Description
             title={"Data de Criação"}
             description={order ? formatDate(order?.createdAt) : "..."}
