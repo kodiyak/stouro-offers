@@ -3,13 +3,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { startOfDay } from "date-fns";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/clients/api";
-import { useDateFormatter } from "@/lib/hooks";
+import type { OrderStatus } from "@/lib/enums";
+import { useDateFormatter, useLabelColors, useLabels } from "@/lib/hooks";
+import { cn } from "@/lib/utils";
 import OrderCard from "./order-card";
+
+const STATUSES: OrderStatus[] = ["DRAFT", "PAID", "CANCELLED"];
 
 export default function ListOrders() {
   const { formatDate } = useDateFormatter();
+  const labels = useLabels();
+  const { ORDER_STATUS: ORDER_STATUS_COLOR } = useLabelColors();
   const { data: orders = [] } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
@@ -17,9 +24,21 @@ export default function ListOrders() {
     },
   });
 
+  const [tab, setTab] = useState<OrderStatus>("DRAFT");
+
+  const counts = useMemo(
+    () => ({
+      DRAFT: orders.filter((order) => order.status === "DRAFT").length,
+      PAID: orders.filter((order) => order.status === "PAID").length,
+      CANCELLED: orders.filter((order) => order.status === "CANCELLED").length,
+    }),
+    [orders],
+  );
+
   const groupedOrders = useMemo(() => {
+    const filtered = orders.filter((order) => order.status === tab);
     const groups: Record<string, typeof orders> = {};
-    orders.forEach((order) => {
+    filtered.forEach((order) => {
       const date = startOfDay(new Date(order.createdAt)).toISOString();
       if (!groups[date]) {
         groups[date] = [];
@@ -28,24 +47,55 @@ export default function ListOrders() {
     });
 
     return Object.entries(groups);
-  }, [orders]);
+  }, [orders, tab]);
 
   return (
-    <div className="flex flex-col gap-8">
-      {groupedOrders.map(([date, orders]) => (
-        <div className="flex flex-col gap-2" key={date}>
-          <span className="text-sm font-bold text-muted-foreground">
-            {formatDate(date, "PP")}
-          </span>
-          <div className="flex flex-col gap-2">
-            {orders.map((order) => (
-              <Link key={order.id} href={`/orders/${order.id}`}>
-                <OrderCard order={order} />
-              </Link>
+    <Tabs
+      value={tab}
+      onValueChange={(value) => setTab(value as OrderStatus)}
+      className="w-full"
+    >
+      <TabsList className="grid w-full grid-cols-3">
+        {STATUSES.map((status) => (
+          <TabsTrigger key={status} value={status}>
+            {labels.ORDER_STATUS[status]}
+            <span
+              className={cn(
+                "rounded-full px-1.5 py-0.5 text-xs font-bold",
+                ORDER_STATUS_COLOR[status],
+              )}
+            >
+              {counts[status]}
+            </span>
+          </TabsTrigger>
+        ))}
+      </TabsList>
+      <TabsContent value={tab}>
+        {groupedOrders.length === 0 ? (
+          <div className="flex flex-col items-center gap-1 py-16 text-center">
+            <span className="text-sm text-muted-foreground">
+              Nenhum pedido {labels.ORDER_STATUS[tab].toLowerCase()}
+            </span>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-8">
+            {groupedOrders.map(([date, orders]) => (
+              <div className="flex flex-col gap-2" key={date}>
+                <span className="text-sm font-bold text-muted-foreground">
+                  {formatDate(date, "PP")}
+                </span>
+                <div className="flex flex-col gap-2">
+                  {orders.map((order) => (
+                    <Link key={order.id} href={`/orders/${order.id}`}>
+                      <OrderCard order={order} />
+                    </Link>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-      ))}
-    </div>
+        )}
+      </TabsContent>
+    </Tabs>
   );
 }
