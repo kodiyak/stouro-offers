@@ -49,7 +49,6 @@ export async function POST(req: NextRequest) {
           data: products.map((product) => ({
             name: product.name,
             productId: product.id,
-            amountTotal: product.price * (data.products[product.id] || 0),
             price: product.price,
             quantity: data.products[product.id] || 0,
           })),

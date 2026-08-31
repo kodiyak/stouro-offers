@@ -44,8 +44,7 @@ model Order {
   createdAt   DateTime    @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime    @updatedAt @db.Timestamptz(3)
   items       OrderItem[]
-  manifest    Manifest?   @relation(fields: [manifestId], references: [id])
-  manifestId  String?     @unique
+  manifests   Manifest[]
 }
 
 enum OrderStatus {
@@ -58,11 +57,10 @@ model OrderItem {
   id          String   @id @default(uuid())
   order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId     String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
   productId   String
   name        String
   price       Int
-  amountTotal Int
   quantity    Int
   createdAt   DateTime @default(now()) @db.Timestamptz(3)
   updatedAt   DateTime @updatedAt @db.Timestamptz(3)
@@ -128,26 +126,20 @@ model Transaction {
 }
 
 model Manifest {
-  id             String         @id @default(uuid())
-  customer       Customer?      @relation(fields: [customerId], references: [id])
-  customerId     String?
-  order          Order?
-  fileUrl        String?
-  fileType       String?
-  fileSize       Int?
-  documentType   String
-  manifestNumber String
-  payload        Json           @db.JsonB
-  createdAt      DateTime       @default(now()) @db.Timestamptz(3)
-  updatedAt      DateTime       @updatedAt @db.Timestamptz(3)
-  status         ManifestStatus @default(PENDING_REVIEW)
-}
+  id           String    @id @default(uuid())
+  customer     Customer? @relation(fields: [customerId], references: [id])
+  customerId   String?
+  order        Order?    @relation(fields: [orderId], references: [id])
+  orderId      String?
+  fileUrl      String?
+  fileType     String?
+  fileSize     Int?
+  documentType String
+  payload      Json      @db.JsonB
+  createdAt    DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(3)
 
-enum ManifestStatus {
-  PENDING_REVIEW
-  APPROVED
-  CONVERTED
-  REJECTED
+  @@index([orderId])
 }
 
 model Link {

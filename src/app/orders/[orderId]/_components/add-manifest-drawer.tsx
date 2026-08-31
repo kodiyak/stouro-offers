@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
+import { UploadIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
@@ -25,6 +25,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/clients/api";
 import { type UseDisclosure, useMutationAPI } from "@/lib/hooks";
+import { invalidateQueries } from "@/lib/utils";
 
 const schema = z.object({
   file: z.instanceof(File, { message: "File is required" }),
@@ -32,13 +33,16 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
-interface CreateManifestProps extends UseDisclosure {}
+interface AddManifestDrawerProps extends UseDisclosure {
+  orderId: string;
+}
 
-export default function CreateManifest({
+export default function AddManifestDrawer({
   isOpen,
   onOpenChange,
   onClose,
-}: CreateManifestProps) {
+  orderId,
+}: AddManifestDrawerProps) {
   const form = useForm<FormValues>({
     resolver: zodResolver(schema) as never,
   });
@@ -46,26 +50,27 @@ export default function CreateManifest({
 
   const onSubmit = useMutationAPI({
     mutationFn: async (data: FormValues) => {
-      console.log(data);
-      await api.manifests.upload({
-        file: data.file,
-      });
-      // Intentionally empty - implementation to be provided later
+      return api.orders.addManifest({ orderId, file: data.file });
     },
     onSuccess: async () => {
-      // onClose();
+      await invalidateQueries(["orders", orderId]);
+      onClose();
     },
     toast: {
       loading: () => ({
-        title: "Enviando fixa...",
-        description: "Estamos processando o seu arquivo.",
+        title: "Processando romaneio...",
+        description: "A IA está extraindo os itens da imagem.",
       }),
-      success: () => ({
-        title: "Fixa enviada!",
-        description: "Seu arquivo foi enviado com sucesso.",
+      success: ({ data }) => ({
+        title: "Romaneio processado!",
+        description: `${data?.addedItems ?? 0} itens adicionados${
+          data?.createdProducts
+            ? `, ${data.createdProducts} novos produtos`
+            : ""
+        }.`,
       }),
       error: ({ error }) => ({
-        title: "Erro ao enviar fixa",
+        title: "Erro ao processar romaneio",
         description: error?.message || "Tente novamente mais tarde.",
       }),
     },
@@ -75,16 +80,16 @@ export default function CreateManifest({
     if (isOpen) {
       form.reset({ file: undefined });
     }
-  }, [isOpen]);
+  }, [isOpen, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Enviar Ficha</DrawerTitle>
+          <DrawerTitle>Adicionar Romaneio</DrawerTitle>
           <DrawerDescription>
-            Envie um arquivo de manifesto para anexar à sua conta. Formato
-            aceito: imagens.
+            Envie a foto do romaneio. A IA extrai os itens e adiciona ao pedido.
+            Formato aceito: imagens até 5MB.
           </DrawerDescription>
         </DrawerHeader>
 
@@ -98,16 +103,20 @@ export default function CreateManifest({
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor={field.name}>Nome</FieldLabel>
+                    <FieldLabel htmlFor={field.name}>
+                      Imagem do romaneio
+                    </FieldLabel>
                     <Input
-                      // {...field}
-                      // value={field.value as never}
                       onChange={(e) => {
-                        field.onChange((e.target as any).files[0]);
+                        const input = e.target as unknown as {
+                          files?: FileList | null;
+                        };
+                        field.onChange(input.files?.[0] as File);
                       }}
                       id={field.name}
                       aria-invalid={fieldState.invalid}
                       type={"file"}
+                      accept="image/*"
                     />
                     <FieldDescription>Max. 5MB</FieldDescription>
                     {fieldState.invalid && (
@@ -116,7 +125,6 @@ export default function CreateManifest({
                   </Field>
                 )}
               />
-              {/* Intentionally left empty: file picker and drawer content to be implemented later */}
             </FieldGroup>
           </FieldSet>
 
@@ -125,10 +133,10 @@ export default function CreateManifest({
               size={"lg"}
               className="rounded-full"
               type={"submit"}
-              // disabled={isSubmitting || !isDirty || !isValid}
+              disabled={isSubmitting || !isDirty || !isValid}
             >
-              <PlusIcon />
-              <span>Enviar Fixa</span>
+              <UploadIcon />
+              <span>Processar Romaneio</span>
             </Button>
           </DrawerFooter>
         </form>

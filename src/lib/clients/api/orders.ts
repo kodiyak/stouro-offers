@@ -1,3 +1,4 @@
+import { toFormData } from "axios";
 import type { Api } from "./types";
 import { http } from "./utils";
 
@@ -35,5 +36,32 @@ export async function paid({ orderId }: { orderId: string }) {
 export async function restore({ orderId }: { orderId: string }) {
   return http
     .post<{ order: Api.Order }>(`/orders/${orderId}/restore`)
+    .then((res) => res.data);
+}
+
+export async function addManifest(data: { orderId: string; file: File }) {
+  return http
+    .post<{
+      success: boolean;
+      manifest: Api.Manifest;
+      order: Api.Order;
+      addedItems: number;
+      createdProducts: number;
+    }>(`/orders/${data.orderId}/manifests`, toFormData(data), {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+    .then((res) => res.data);
+}
+
+export async function mergeItems(data: {
+  orderId: string;
+  itemId: string;
+  itemIds: string[];
+}) {
+  return http
+    .post<{ order: Api.Order }>(`/orders/${data.orderId}/items/merge`, {
+      itemId: data.itemId,
+      itemIds: data.itemIds,
+    })
     .then((res) => res.data);
 }

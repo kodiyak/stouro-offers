@@ -21,7 +21,7 @@ export default function OrderItemCard({ item }: OrderItemCardProps) {
           </span>
         </div>
         <span className="text-xl font-bold">
-          {formatCurrency(item.amountTotal)}
+          {formatCurrency(item.quantity * item.price)}
         </span>
       </div>
     </Card>

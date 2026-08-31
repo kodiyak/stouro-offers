@@ -1,4 +1,4 @@
-import type { OrderStatus } from "../enums";
+import type { ManifestDocumentType, OrderStatus } from "../enums";
 
 export function useLabels() {
   const ORDER_STATUS: Record<OrderStatus, string> = {
@@ -7,5 +7,10 @@ export function useLabels() {
     CANCELLED: "Cancelado",
   };
 
-  return { ORDER_STATUS };
+  const MANIFEST_DOCUMENT_TYPE: Record<ManifestDocumentType, string> = {
+    HANDWRITTEN: "Manual",
+    PRINTED: "Impresso",
+  };
+
+  return { ORDER_STATUS, MANIFEST_DOCUMENT_TYPE };
 }

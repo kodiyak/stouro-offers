@@ -4,9 +4,9 @@ import { db } from "@/lib/clients/db";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { customerId: string } },
+  { params }: RouteContext<"/api/customers/[customerId]/beneficiaries">,
 ) {
-  const { customerId } = params;
+  const { customerId } = await params;
 
   const beneficiaries = await db.beneficiary.findMany({
     where: { customerId },
@@ -18,7 +18,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { customerId: string } },
+  { params }: RouteContext<"/api/customers/[customerId]/beneficiaries">,
 ) {
   const schema = z.object({
     name: z.string().min(1),
@@ -34,7 +34,7 @@ export async function POST(
   }
 
   const { data } = body;
-  const { customerId } = params;
+  const { customerId } = await params;
 
   const beneficiary = await db.beneficiary.create({
     data: {

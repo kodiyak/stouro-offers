@@ -1,13 +1,7 @@
 "use client";
 
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import { useQuery } from "@tanstack/react-query";
-import {
-  DollarSignIcon,
-  DownloadIcon,
-  EllipsisIcon,
-  ShareIcon,
-} from "lucide-react";
+import { EllipsisIcon, PlusIcon } from "lucide-react";
 import AppLayout from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import { Description } from "@/components/ui/description";
@@ -19,8 +13,9 @@ import {
   useDisclosure,
   useLabels,
 } from "@/lib/hooks";
-import { getOrderPosition } from "@/lib/utils";
+import AddManifestDrawer from "./add-manifest-drawer";
 import DownloadOrderPdfButton from "./download-order-pdf-button";
+import ListManifests from "./list-manifests";
 import ListOrderItems from "./list-order-items";
 import OrderMoreOptions from "./order-more-options";
 
@@ -30,6 +25,7 @@ interface OrderPageProps {
 
 export default function OrderPage({ orderId }: OrderPageProps) {
   const moreOptions = useDisclosure();
+  const addManifest = useDisclosure();
 
   const labels = useLabels();
 
@@ -45,6 +41,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
   return (
     <>
       {order && <OrderMoreOptions order={order} {...moreOptions} />}
+      {order && <AddManifestDrawer orderId={orderId} {...addManifest} />}
       <AppLayout
         title={`Pedido ${order ? `#${order.orderNumber}` : "..."}`}
         description={order?.customer.name ?? "..."}
@@ -92,6 +89,21 @@ export default function OrderPage({ orderId }: OrderPageProps) {
           <ListOrderItems
             items={(order?.items ?? []).filter((item) => item.quantity > 0)}
           />
+        </div>
+        <div className="flex flex-col gap-2 my-6">
+          <div className="flex items-center justify-between">
+            <h3 className="font-medium">Romaneios</h3>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="rounded-full"
+              onClick={addManifest.onOpen}
+            >
+              <PlusIcon className="size-4" />
+              <span>Adicionar</span>
+            </Button>
+          </div>
+          <ListManifests manifests={order?.manifests ?? []} />
         </div>
         <Separator />
         <div className="grid grid-cols gap-2 my-6">

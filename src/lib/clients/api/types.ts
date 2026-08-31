@@ -1,4 +1,5 @@
-import type { OrderStatus } from "@/lib/enums";
+import type { ManifestDocumentType, OrderStatus } from "@/lib/enums";
+import type { IManifest } from "@/lib/types";
 
 export namespace Api {
   export interface Customer {
@@ -33,6 +34,7 @@ export namespace Api {
     createdAt: string;
     updatedAt: string;
     items: Api.OrderItem[];
+    manifests: Api.Manifest[];
     customer: Api.Customer;
   }
 
@@ -43,7 +45,6 @@ export namespace Api {
     productId: string;
     quantity: number;
     price: number;
-    amountTotal: number;
     createdAt: string;
     updatedAt: string;
   }
@@ -58,13 +59,13 @@ export namespace Api {
 
   export interface Manifest {
     id: string;
+    orderId?: string | null;
     customerId?: string | null;
     fileUrl?: string | null;
     fileType?: string | null;
     fileSize?: number | null;
-    documentType: string;
-    manifestNumber: string;
-    payload: any;
+    documentType: ManifestDocumentType;
+    payload: IManifest & { fullText: string };
     createdAt: string;
     updatedAt: string;
   }

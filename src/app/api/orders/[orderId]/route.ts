@@ -13,6 +13,6 @@ export async function GET(
 async function getOrder(orderId: string) {
   return db.order.findUnique({
     where: { id: orderId },
-    include: { items: true, customer: true },
+    include: { items: true, manifests: true, customer: true },
   });
 }

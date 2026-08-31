@@ -9,7 +9,6 @@ import {
 import Logo from "@/assets/logo_pdf.png";
 import type { Api } from "@/lib/clients/api/types";
 import { useCurrencyFormatter } from "@/lib/hooks";
-import { getOrderPosition } from "@/lib/utils";
 
 const styles = StyleSheet.create({
   page: {
@@ -71,7 +70,7 @@ export default function OrderDocument({ order }: OrderDocumentProps) {
   const { formatCurrency } = useCurrencyFormatter();
 
   const amountTotal = order.items.reduce(
-    (acc, item) => acc + item.amountTotal,
+    (acc, item) => acc + item.price * item.quantity,
     0,
   );
 
@@ -98,7 +97,7 @@ export default function OrderDocument({ order }: OrderDocumentProps) {
                     </Text>
                   </View>
                   <Text style={{ fontWeight: "bold" }}>
-                    {formatCurrency(item.amountTotal)}
+                    {formatCurrency(item.price * item.quantity)}
                   </Text>
                 </View>
               ))}
