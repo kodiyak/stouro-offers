@@ -38,6 +38,8 @@ export default function OrderPage({ orderId }: OrderPageProps) {
     },
   });
 
+  const isEditable = order?.status === "DRAFT";
+
   return (
     <>
       {order && <OrderMoreOptions order={order} {...moreOptions} />}
@@ -46,19 +48,20 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         title={`Pedido ${order ? `#${order.orderNumber}` : "..."}`}
         description={order?.customer.name ?? "..."}
         goBack={"/"}
-        isOverlayed={moreOptions.isOpen}
+        isOverlayed={moreOptions.isOpen || addManifest.isOpen}
         footer={
-          <div className="grid gap-2.5">
-            {order && <DownloadOrderPdfButton order={order} />}
-            <Button
-              size={"drawer"}
-              className="rounded-full"
-              variant={"secondary"}
-              onClick={moreOptions.onOpen}
-            >
-              <EllipsisIcon className="size-5 mr-2" />
-              <span>Mais Opções</span>
-            </Button>
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              {order && <DownloadOrderPdfButton order={order} />}
+              <Button
+                size={"icon-lg"}
+                className="rounded-full"
+                variant={"secondary"}
+                onClick={moreOptions.onOpen}
+              >
+                <EllipsisIcon />
+              </Button>
+            </div>
           </div>
         }
       >
@@ -86,9 +89,14 @@ export default function OrderPage({ orderId }: OrderPageProps) {
           </div>
         </div>
         <div className="flex flex-col my-6">
-          <ListOrderItems
-            items={(order?.items ?? []).filter((item) => item.quantity > 0)}
-          />
+          {order && (
+            <ListOrderItems
+              items={order.items.filter((item) => item.quantity > 0)}
+              orderId={orderId}
+              customerId={order.customerId}
+              editable={isEditable}
+            />
+          )}
         </div>
         <div className="flex flex-col gap-2 my-6">
           <div className="flex items-center justify-between">

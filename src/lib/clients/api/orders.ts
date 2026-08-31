@@ -65,3 +65,28 @@ export async function mergeItems(data: {
     })
     .then((res) => res.data);
 }
+
+export async function updateItem(data: {
+  orderId: string;
+  itemId: string;
+  quantity: number;
+  price: number; // em centavos
+}) {
+  return http
+    .patch<{ order: Api.Order }>(
+      `/orders/${data.orderId}/items/${data.itemId}`,
+      {
+        quantity: data.quantity,
+        price: data.price,
+      },
+    )
+    .then((res) => res.data);
+}
+
+export async function deleteItem(data: { orderId: string; itemId: string }) {
+  return http
+    .delete<{ order: Api.Order }>(
+      `/orders/${data.orderId}/items/${data.itemId}`,
+    )
+    .then((res) => res.data);
+}

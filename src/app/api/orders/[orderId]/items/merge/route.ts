@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import z from "zod";
 import { db } from "@/lib/clients/db";
-import { sumBy } from "@/lib/utils";
+import { ORDER_ITEM_ORDER_BY, sumBy } from "@/lib/utils";
 
 const schema = z.object({
   itemId: z.string().min(1),
@@ -78,7 +78,11 @@ export async function POST(
 
   const order = await db.order.findUnique({
     where: { id: orderId },
-    include: { items: true, manifests: true, customer: true },
+    include: {
+      items: { orderBy: ORDER_ITEM_ORDER_BY },
+      manifests: true,
+      customer: true,
+    },
   });
 
   return Response.json({ order });

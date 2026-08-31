@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/clients/db";
 import { manifest, s3 } from "@/lib/services";
-import { sumBy } from "@/lib/utils";
+import { ORDER_ITEM_ORDER_BY, sumBy } from "@/lib/utils";
 
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
 
@@ -14,7 +14,7 @@ export async function POST(
 
     const order = await db.order.findUnique({
       where: { id: orderId },
-      include: { items: true },
+      include: { items: { orderBy: ORDER_ITEM_ORDER_BY } },
     });
 
     if (!order) {
@@ -100,7 +100,11 @@ export async function POST(
 
     const updated = await db.order.findUnique({
       where: { id: orderId },
-      include: { items: true, manifests: true, customer: true },
+      include: {
+        items: { orderBy: ORDER_ITEM_ORDER_BY },
+        manifests: true,
+        customer: true,
+      },
     });
 
     return Response.json(

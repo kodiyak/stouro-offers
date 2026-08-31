@@ -37,6 +37,21 @@ export async function addProduct(data: {
     .then((res) => res.data);
 }
 
+export async function updateProduct(data: {
+  productId: string;
+  name: string;
+  price: number; // em centavos
+  orderId?: string;
+  itemId?: string;
+}) {
+  return http
+    .patch<{ product: Api.Product; order: Api.Order | null }>(
+      `/products/${data.productId}`,
+      data,
+    )
+    .then((res) => res.data);
+}
+
 export async function create(data: { name: string; color: string }) {
   return http
     .post<{ customer: Api.Customer }>(`/customers`, data)

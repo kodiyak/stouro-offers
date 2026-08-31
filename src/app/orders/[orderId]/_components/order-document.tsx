@@ -15,6 +15,12 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     backgroundColor: "#ffffff",
   },
+  header: {
+    padding: 10,
+    backgroundColor: "#f5f5f5",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   section: {
     margin: 10,
     padding: 10,
@@ -77,7 +83,7 @@ export default function OrderDocument({ order }: OrderDocumentProps) {
   return (
     <Document key={Date.now().toString()}>
       <Page size="A4" style={styles.page}>
-        <View>
+        <View style={styles.header}>
           <Image source={Logo.src} style={styles.logo} />
         </View>
         <View style={styles.section}>

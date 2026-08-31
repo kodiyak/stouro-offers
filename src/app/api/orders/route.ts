@@ -2,7 +2,7 @@ import { format, startOfYear } from "date-fns";
 import type { NextRequest } from "next/server";
 import z from "zod";
 import { db } from "@/lib/clients/db";
-import { sumBy } from "@/lib/utils";
+import { ORDER_ITEM_ORDER_BY, sumBy } from "@/lib/utils";
 
 const schema = z.object({
   customerId: z.string(),
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         },
       },
     },
-    include: { items: true, customer: true },
+    include: { items: { orderBy: ORDER_ITEM_ORDER_BY }, customer: true },
   });
 
   return Response.json({ order });
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   const orders = await db.order.findMany({
     where: { status: { notIn: ["CANCELLED"] } },
-    include: { items: true, customer: true },
+    include: { items: { orderBy: ORDER_ITEM_ORDER_BY }, customer: true },
     orderBy: { position: "desc" },
   });
 

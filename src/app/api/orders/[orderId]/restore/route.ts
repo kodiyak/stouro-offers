@@ -1,5 +1,6 @@
 import type { NextRequest } from "next/server";
 import { db } from "@/lib/clients/db";
+import { ORDER_ITEM_ORDER_BY } from "@/lib/utils";
 
 export async function POST(
   _req: NextRequest,
@@ -20,7 +21,7 @@ export async function POST(
   const order = await db.order.update({
     where: { id: orderId },
     data: { status: "DRAFT" },
-    include: { items: true, customer: true },
+    include: { items: { orderBy: ORDER_ITEM_ORDER_BY }, customer: true },
   });
 
   return Response.json({ order });

@@ -12,10 +12,11 @@ interface DownloadOrderPdfButtonProps {
 
 function DownloadOrderPdfButton({ order }: DownloadOrderPdfButtonProps) {
   const id = Date.now();
+
   return (
     <Button
-      size={"drawer"}
-      className="rounded-full"
+      size={"lg"}
+      className="rounded-full flex-1"
       variant={"outline"}
       asChild
     >

@@ -2,7 +2,6 @@ import type { NextRequest } from "next/server";
 import z from "zod";
 import { db } from "@/lib/clients/db";
 import { toProductIcon } from "@/lib/enums";
-import { sumBy } from "@/lib/utils";
 
 const schema = z.object({
   name: z.string().min(1),
