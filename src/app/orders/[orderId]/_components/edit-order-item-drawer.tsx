@@ -18,11 +18,13 @@ import {
 } from "@/components/ui/drawer";
 import {
   Field,
+  FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
   FieldSet,
 } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
 import QuantityStepper from "@/components/ui/quantity-stepper";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/clients/api";
@@ -35,6 +37,7 @@ import {
 import { invalidateQueries } from "@/lib/utils";
 
 const schema = z.object({
+  name: z.string().min(1),
   quantity: z.number().int().min(1),
   price: z
     .union([z.string(), z.number()])
@@ -75,6 +78,7 @@ export default function EditOrderItemDrawer({
         itemId: item.id,
         quantity: data.quantity,
         price: Math.round(data.price * 100),
+        name: data.name,
       });
     },
     onSuccess: async () => {
@@ -122,6 +126,7 @@ export default function EditOrderItemDrawer({
   useEffect(() => {
     if (isOpen) {
       form.reset({
+        name: item.name,
         quantity: item.quantity,
         price: item.price / 100,
       });
@@ -150,6 +155,28 @@ export default function EditOrderItemDrawer({
         >
           <FieldSet className="w-full px-4">
             <FieldGroup>
+              <Controller
+                name="name"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor={field.name}>Nome</FieldLabel>
+                    <Input
+                      {...field}
+                      id={field.name}
+                      aria-invalid={fieldState.invalid}
+                      placeholder={"Camisa Polo, Canarinho, etc..."}
+                      autoComplete="off"
+                    />
+                    <FieldDescription>
+                      Nome exibido no pedido (não altera o produto)
+                    </FieldDescription>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
               <Controller
                 name="quantity"
                 control={form.control}

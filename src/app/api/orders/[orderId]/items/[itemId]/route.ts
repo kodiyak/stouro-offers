@@ -4,6 +4,7 @@ import { db } from "@/lib/clients/db";
 import { ORDER_ITEM_ORDER_BY, sumBy } from "@/lib/utils";
 
 const schema = z.object({
+  name: z.string().min(1).optional(),
   quantity: z.number().int().min(1),
   price: z.number().int().min(0), // em centavos
 });
@@ -42,12 +43,12 @@ export async function PATCH(
     return Response.json({ error: "Item not found" }, { status: 404 });
   }
 
-  const { quantity, price } = body.data;
+  const { name, quantity, price } = body.data;
 
   await db.$transaction(async (tx) => {
     await tx.orderItem.update({
       where: { id: itemId },
-      data: { quantity, price },
+      data: { name, quantity, price },
     });
 
     const remaining = await tx.orderItem.findMany({ where: { orderId } });

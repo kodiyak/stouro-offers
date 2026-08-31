@@ -69,6 +69,7 @@ export async function mergeItems(data: {
 export async function updateItem(data: {
   orderId: string;
   itemId: string;
+  name?: string;
   quantity: number;
   price: number; // em centavos
 }) {
@@ -76,6 +77,7 @@ export async function updateItem(data: {
     .patch<{ order: Api.Order }>(
       `/orders/${data.orderId}/items/${data.itemId}`,
       {
+        name: data.name,
         quantity: data.quantity,
         price: data.price,
       },
