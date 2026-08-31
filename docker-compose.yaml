@@ -4,11 +4,11 @@ services:
   postgres:
     image: postgres:13
     environment:
-      POSTGRES_USER: dbuser
-      POSTGRES_PASSWORD: dbpass
-      POSTGRES_DB: dbname
+      POSTGRES_USER: aurauser
+      POSTGRES_PASSWORD: aurapass
+      POSTGRES_DB: auradb
     ports:
-      - "5432:5432"
+      - "9032:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 

@@ -10,7 +10,7 @@ export const manifestItemSchema = z.object({
 export type IManifestItem = z.infer<typeof manifestItemSchema>;
 
 export const manifestSchema = z.object({
-  documentType: z.enum(["INTERNAL", "EXTERNAL"]),
+  documentType: z.enum(["HANDWRITTEN", "PRINTED"]),
   customer: z
     .object({
       name: z.string(),
