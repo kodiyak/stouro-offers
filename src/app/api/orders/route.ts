@@ -63,7 +63,6 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   const orders = await db.order.findMany({
-    where: { status: { notIn: ["CANCELLED"] } },
     include: { items: { orderBy: ORDER_ITEM_ORDER_BY }, customer: true },
     orderBy: { position: "desc" },
   });
