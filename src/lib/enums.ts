@@ -6,6 +6,12 @@ export type OrderStatus = z.infer<typeof orderStatusEnum>;
 export const productStatusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 export type ProductStatus = z.infer<typeof productStatusEnum>;
 
+export const transactionTypeEnum = z.enum(["CHARGE", "PAYMENT", "ADJUSTMENT"]);
+export type TransactionType = z.infer<typeof transactionTypeEnum>;
+
+export const TRANSACTION_TARGET_TYPES = ["CUSTOMER"] as const;
+export type TransactionTargetType = (typeof TRANSACTION_TARGET_TYPES)[number];
+
 export const MANIFEST_DOCUMENT_TYPES = ["HANDWRITTEN", "PRINTED"] as const;
 export type ManifestDocumentType = (typeof MANIFEST_DOCUMENT_TYPES)[number];
 
@@ -14,3 +20,9 @@ export type ProductIcon = z.infer<typeof productIconEnum>;
 export function toProductIcon(icon: ProductIcon): ProductIcon {
   return icon;
 }
+
+export const ERROR_CODES = ["INVALID_INPUT"] as const;
+export type ErrorCode = (typeof ERROR_CODES)[number];
+
+export const ERROR_CATEGORIES = ["VALIDATION"] as const;
+export type ErrorCategory = (typeof ERROR_CATEGORIES)[number];

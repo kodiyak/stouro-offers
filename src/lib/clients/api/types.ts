@@ -2,8 +2,11 @@ import type {
   ManifestDocumentType,
   OrderStatus,
   ProductStatus,
+  TransactionTargetType,
+  TransactionType,
 } from "@/lib/enums";
 import type { IManifest } from "@/lib/types";
+import type { TransactionMetadata } from "@/lib/utils/validations/transaction";
 
 export namespace Api {
   export interface Customer {
@@ -71,6 +74,18 @@ export namespace Api {
     fileSize?: number | null;
     documentType: ManifestDocumentType;
     payload: IManifest & { fullText: string };
+    createdAt: string;
+    updatedAt: string;
+  }
+
+  export interface Transaction {
+    id: string;
+    amount: number;
+    type: TransactionType;
+    targetType: TransactionTargetType;
+    targetId: string;
+    description: string;
+    metadata: TransactionMetadata;
     createdAt: string;
     updatedAt: string;
   }

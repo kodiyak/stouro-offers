@@ -1,1 +1,1 @@
-export * from "./transitions";
+export * from "../utils/transitions";
