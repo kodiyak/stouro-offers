@@ -2,19 +2,10 @@ import { db } from "@/lib/clients/db";
 import { AppError } from "@/lib/utils/error";
 import type { TransactionInputResolver } from "./protocol";
 
-export const customerTransactionResolver: TransactionInputResolver = async (
-  props,
-) => {
-  const { targetId, targetType } = props;
-
-  if (targetType !== "CUSTOMER") {
-    throw new AppError({
-      code: "INVALID_INPUT",
-      category: "VALIDATION",
-      message: `Invalid targetType: ${targetType}. Expected 'CUSTOMER'.`,
-      details: { targetType },
-    });
-  }
+export const customerTransactionResolver: TransactionInputResolver<
+  "CUSTOMER"
+> = async (props) => {
+  const { targetId } = props;
 
   const customer = await db.customer.findUnique({
     where: { id: targetId },
@@ -28,4 +19,13 @@ export const customerTransactionResolver: TransactionInputResolver = async (
       details: { targetId },
     });
   }
+
+  return {
+    amount: props.amount,
+    description: props.description,
+    metadata: props.metadata,
+    targetType: "CUSTOMER",
+    targetId: customer.id,
+    type: props.type,
+  };
 };

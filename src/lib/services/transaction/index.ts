@@ -4,10 +4,10 @@ import type { TransactionInputResolver } from "./protocol";
 
 export function getTransactionInputResolver<T extends TransactionTargetType>(
   type: T,
-): TransactionInputResolver {
+): TransactionInputResolver<T> {
   const handlers = {
     CUSTOMER: customerTransactionResolver,
   };
 
-  return handlers[type];
+  return handlers[type] as TransactionInputResolver<T>;
 }
