@@ -1,4 +1,4 @@
-import type { OrderStatus } from "../enums";
+import type { OrderStatus, ProductStatus } from "../enums";
 
 export function useLabelColors() {
   const ORDER_STATUS: Record<OrderStatus, string> = {
@@ -7,5 +7,10 @@ export function useLabelColors() {
     CANCELLED: "bg-red-500/15 text-red-500",
   };
 
-  return { ORDER_STATUS };
+  const PRODUCT_STATUS: Record<ProductStatus, string> = {
+    ACTIVE: "bg-emerald-500/15 text-emerald-500",
+    INACTIVE: "bg-muted text-muted-foreground",
+  };
+
+  return { ORDER_STATUS, PRODUCT_STATUS };
 }

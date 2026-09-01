@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { CheckIcon } from "lucide-react";
+import { ArchiveIcon, CheckIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
@@ -103,6 +103,28 @@ export default function EditProduct({
     },
   });
 
+  const archive = useMutationAPI({
+    mutationFn: async () => api.customers.archiveProduct({ productId }),
+    onSuccess: async () => {
+      await invalidateQueries(["customers", customerId, "products"]);
+      onClose();
+    },
+    toast: {
+      loading: () => ({
+        title: "Arquivando produto...",
+        description: "Estamos arquivando o produto.",
+      }),
+      success: () => ({
+        title: "Produto arquivado!",
+        description: "O produto não aparece mais na listagem de novos pedidos.",
+      }),
+      error: () => ({
+        title: "Erro ao arquivar produto",
+        description: "Tente novamente mais tarde.",
+      }),
+    },
+  });
+
   useEffect(() => {
     if (isOpen && product) {
       form.reset({
@@ -166,7 +188,16 @@ export default function EditProduct({
               />
             </FieldGroup>
           </FieldSet>
-          <DrawerFooter>
+          <DrawerFooter className="grid grid-cols-1 gap-2.5">
+            <Button
+              variant={"outline"}
+              size={"drawer"}
+              onClick={() => archive.mutateAsync()}
+              disabled={archive.isPending}
+            >
+              <ArchiveIcon />
+              <span>Arquivar</span>
+            </Button>
             <Button
               size={"drawer"}
               type={"submit"}

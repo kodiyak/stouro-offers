@@ -1,4 +1,8 @@
-import type { ManifestDocumentType, OrderStatus } from "@/lib/enums";
+import type {
+  ManifestDocumentType,
+  OrderStatus,
+  ProductStatus,
+} from "@/lib/enums";
 import type { IManifest } from "@/lib/types";
 
 export namespace Api {
@@ -20,6 +24,7 @@ export namespace Api {
     price: number;
     icon: string;
     customerId: string;
+    status: ProductStatus;
     createdAt: string;
     updatedAt: string;
   }

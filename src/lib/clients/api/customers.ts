@@ -13,9 +13,17 @@ export async function getCustomer({ customerId }: { customerId: string }) {
     .then((res) => res.data);
 }
 
-export async function getProducts({ customerId }: { customerId: string }) {
+export async function getProducts({
+  customerId,
+  status,
+}: {
+  customerId: string;
+  status?: "ALL" | "ACTIVE" | "INACTIVE";
+}) {
   return http
-    .get<{ products: Api.Product[] }>(`/customers/${customerId}/products`)
+    .get<{ products: Api.Product[] }>(`/customers/${customerId}/products`, {
+      params: { status },
+    })
     .then((res) => res.data);
 }
 
@@ -55,6 +63,12 @@ export async function updateProduct(data: {
 export async function archiveProduct({ productId }: { productId: string }) {
   return http
     .post<{ product: Api.Product }>(`/products/${productId}/archive`)
+    .then((res) => res.data);
+}
+
+export async function restoreProduct({ productId }: { productId: string }) {
+  return http
+    .post<{ product: Api.Product }>(`/products/${productId}/restore`)
     .then((res) => res.data);
 }
 
