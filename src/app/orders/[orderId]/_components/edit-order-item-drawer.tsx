@@ -178,23 +178,6 @@ export default function EditOrderItemDrawer({
                 )}
               />
               <Controller
-                name="quantity"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Quantidade</FieldLabel>
-                    <QuantityStepper
-                      value={field.value}
-                      onChange={field.onChange}
-                      min={1}
-                    />
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-              <Controller
                 name="price"
                 control={form.control}
                 render={({ field, fieldState }) => (
@@ -205,6 +188,23 @@ export default function EditOrderItemDrawer({
                       id={field.name}
                       aria-invalid={fieldState.invalid}
                       autoComplete="off"
+                    />
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              <Controller
+                name="quantity"
+                control={form.control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Quantidade</FieldLabel>
+                    <QuantityStepper
+                      value={field.value}
+                      onChange={field.onChange}
+                      min={1}
                     />
                     {fieldState.invalid && (
                       <FieldError errors={[fieldState.error]} />

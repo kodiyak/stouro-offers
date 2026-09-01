@@ -27,6 +27,13 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  if (products.length !== Object.keys(data.products).length) {
+    return Response.json(
+      { error: "Alguns produtos não pertencem a este cliente" },
+      { status: 400 },
+    );
+  }
+
   const amountTotal = sumBy(products, (product) => {
     const quantity = data.products[product.id] || 0;
     return product.price * quantity;

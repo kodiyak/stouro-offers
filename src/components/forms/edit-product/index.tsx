@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { PlusIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { CheckIcon } from "lucide-react";
 import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
@@ -26,42 +27,60 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/clients/api";
+import type { Api } from "@/lib/clients/api/types";
 import { type UseDisclosure, useMutationAPI } from "@/lib/hooks";
 import { invalidateQueries } from "@/lib/utils";
 
 const schema = z.object({
   name: z.string().min(1),
   price: z
-    .string()
-    .transform((val) => Number(val.split(",").join(".")))
+    .union([z.string(), z.number()])
+    .transform((val) =>
+      typeof val === "number" ? val : Number(val.split(",").join(".")),
+    )
     .refine((val) => val >= 0, {
-      message: "Price must be a non-negative number",
+      message: "Preço deve ser um número não negativo",
     }),
 });
 
 type FormValues = z.infer<typeof schema>;
 
-interface CreateProductProps extends UseDisclosure {
+interface EditProductProps extends UseDisclosure {
   customerId: string;
+  productId: string;
 }
 
-export default function CreateProduct({
+export default function EditProduct({
   isOpen,
   onOpenChange,
   onClose,
   customerId,
-}: CreateProductProps) {
+  productId,
+}: EditProductProps) {
   useOverlayedActive(isOpen);
   const form = useForm<FormValues>({
     resolver: zodResolver(schema) as never,
   });
   const { isSubmitting, isDirty, isValid } = form.formState;
 
+  const { data: products = [] } = useQuery({
+    enabled: isOpen,
+    queryKey: ["customers", customerId, "products"],
+    queryFn: async () => {
+      return api.customers
+        .getProducts({ customerId })
+        .then((res) => res.products);
+    },
+  });
+
+  const product = products.find((product) => product.id === productId);
+
   const onSubmit = useMutationAPI({
     mutationFn: async (data: FormValues) => {
-      return api.customers.addProduct({
-        customerId,
-        ...data,
+      return api.customers.updateProduct({
+        productId,
+        name: data.name,
+        price: Math.round(data.price * 100),
       });
     },
     onSuccess: async () => {
@@ -70,36 +89,36 @@ export default function CreateProduct({
     },
     toast: {
       loading: () => ({
-        title: "Cadastrando produto...",
-        description: "Estamos cadastrando seu novo produto.",
+        title: "Salvando produto...",
+        description: "Estamos atualizando o produto.",
       }),
       success: () => ({
-        title: "Produto cadastrado!",
-        description: "Seu produto foi cadastrado com sucesso.",
+        title: "Produto atualizado!",
+        description: "O produto foi atualizado com sucesso.",
       }),
       error: ({ error }) => ({
-        title: "Erro ao cadastrar produto",
+        title: "Erro ao atualizar produto",
         description: error?.message || "Tente novamente mais tarde.",
       }),
     },
   });
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && product) {
       form.reset({
-        name: "",
-        price: 0,
+        name: product.name,
+        price: product.price / 100,
       });
     }
-  }, [isOpen]);
+  }, [isOpen, product, form]);
 
   return (
     <Drawer open={isOpen} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Criar Produto</DrawerTitle>
+          <DrawerTitle>Editar Produto</DrawerTitle>
           <DrawerDescription>
-            Preencha os campos abaixo para criar um novo produto.
+            Atualize o nome e o preço base do produto.
           </DrawerDescription>
         </DrawerHeader>
         <form
@@ -149,13 +168,12 @@ export default function CreateProduct({
           </FieldSet>
           <DrawerFooter>
             <Button
-              size={"lg"}
-              className="rounded-full"
+              size={"drawer"}
               type={"submit"}
-              disabled={isSubmitting || !isDirty || !isValid}
+              disabled={isSubmitting || !product || !isDirty || !isValid}
             >
-              <PlusIcon />
-              <span>Cadastrar Produto</span>
+              <CheckIcon />
+              <span>Salvar</span>
             </Button>
           </DrawerFooter>
         </form>

@@ -52,6 +52,12 @@ export async function updateProduct(data: {
     .then((res) => res.data);
 }
 
+export async function archiveProduct({ productId }: { productId: string }) {
+  return http
+    .post<{ product: Api.Product }>(`/products/${productId}/archive`)
+    .then((res) => res.data);
+}
+
 export async function create(data: { name: string; color: string }) {
   return http
     .post<{ customer: Api.Customer }>(`/customers`, data)

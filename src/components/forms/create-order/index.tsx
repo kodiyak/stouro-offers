@@ -3,8 +3,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import {
+  ArchiveIcon,
   ArrowRightIcon,
   MinusIcon,
+  PencilIcon,
   PlusCircleIcon,
   PlusIcon,
   ShirtIcon,
@@ -18,6 +20,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/clients/api";
+import type { Api } from "@/lib/clients/api/types";
 import {
   useCurrencyFormatter,
   useDisclosure,
@@ -25,6 +28,7 @@ import {
 } from "@/lib/hooks";
 import { invalidateQueries } from "@/lib/utils";
 import CreateProduct from "../create-product";
+import EditProduct from "../edit-product";
 
 const schema = z
   .object({
@@ -42,6 +46,10 @@ interface CreateOrderProps {
 export default function CreateOrder({ customerId }: CreateOrderProps) {
   const helpers = [5, 10, 100];
   const createProduct = useDisclosure();
+  const editProduct = useDisclosure();
+  const [editingProduct, setEditingProduct] = useState<Api.Product | null>(
+    null,
+  );
 
   const { formatCurrency } = useCurrencyFormatter();
   const router = useRouter();
@@ -91,13 +99,35 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
     },
   });
 
+  const archive = useMutationAPI({
+    mutationFn: async (productId: string) =>
+      api.customers.archiveProduct({ productId }),
+    onSuccess: async () => {
+      await invalidateQueries(["customers", customerId, "products"]);
+    },
+    toast: {
+      loading: () => ({
+        title: "Arquivando produto...",
+        description: "Estamos arquivando o produto.",
+      }),
+      success: () => ({
+        title: "Produto arquivado!",
+        description: "O produto não aparece mais na listagem de novos pedidos.",
+      }),
+      error: () => ({
+        title: "Erro ao arquivar produto",
+        description: "Tente novamente mais tarde.",
+      }),
+    },
+  });
+
   useEffect(() => {
     form.reset({ products: {} });
 
     return () => {
       invalidateQueries(["customers", customerId, "products"]);
     };
-  }, []);
+  }, [customerId, form.reset]);
 
   useEffect(() => {
     const off = form.subscribe({
@@ -125,6 +155,11 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
   return (
     <>
       <CreateProduct customerId={customerId} {...createProduct} />
+      <EditProduct
+        {...editProduct}
+        customerId={customerId}
+        productId={editingProduct?.id ?? ""}
+      />
       <FormProvider {...form}>
         <form onSubmit={form.handleSubmit((v) => onSubmit.mutateAsync(v))}>
           <FormLayout
@@ -164,7 +199,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                   render={({ field }) => (
                     <Card className="py-4">
                       <div className="flex items-center gap-2 px-4">
-                        <ShirtIcon className="size-6 mr-2 self-start relative top-1" />
+                        <ShirtIcon className="size-6 mr-2 self-start relative top-1 text-muted-foreground" />
                         <div className="flex flex-col flex-1">
                           <span className="text-xl font-bold">
                             {product.name}
@@ -176,6 +211,26 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                         <span className="font-mono">
                           {formatCurrency(product.price * field.value)}
                         </span>
+                        <Button
+                          type={"button"}
+                          variant={"ghost"}
+                          size={"icon"}
+                          onClick={() => {
+                            setEditingProduct(product);
+                            editProduct.onOpen();
+                          }}
+                        >
+                          <PencilIcon />
+                        </Button>
+                        <Button
+                          type={"button"}
+                          variant={"ghost"}
+                          size={"icon"}
+                          onClick={() => archive.mutateAsync(product.id)}
+                          disabled={archive.isPending}
+                        >
+                          <ArchiveIcon />
+                        </Button>
                       </div>
                       <div className="p-4 flex items-center justify-center">
                         <span className="text-5xl font-black">
@@ -228,7 +283,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                           })),
                         ].map(({ icon, onClick, ...rest }, index) => (
                           <Button
-                            key={index}
+                            key={index as never}
                             variant={"outline"}
                             onClick={onClick}
                             {...rest}
