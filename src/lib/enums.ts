@@ -11,7 +11,12 @@ export type OrderStatus = z.infer<typeof orderStatusEnum>;
 export const productStatusEnum = z.enum(["ACTIVE", "INACTIVE"]);
 export type ProductStatus = z.infer<typeof productStatusEnum>;
 
-export const transactionTypeEnum = z.enum(["CHARGE", "PAYMENT", "ADJUSTMENT"]);
+export const transactionTypeEnum = z.enum([
+  "CHARGE",
+  "PAYMENT",
+  "ADJUSTMENT",
+  "REVERSAL",
+]);
 export type TransactionType = z.infer<typeof transactionTypeEnum>;
 
 export const TRANSACTION_TARGET_TYPES = ["CUSTOMER"] as const;

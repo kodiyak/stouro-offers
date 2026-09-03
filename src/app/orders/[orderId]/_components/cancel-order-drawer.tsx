@@ -1,8 +1,11 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import z from "zod";
 import { useOverlayedActive } from "@/components/providers/overlayed-provider";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -16,7 +19,7 @@ import {
 } from "@/components/ui/drawer";
 import {
   Field,
-  FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSet,
@@ -28,7 +31,26 @@ import {
   useCurrencyFormatter,
   useMutationAPI,
 } from "@/lib/hooks";
-import { cn, invalidateQueries } from "@/lib/utils";
+import { invalidateQueries } from "@/lib/utils";
+
+const schema = z.object({
+  amount: z
+    .union([z.string(), z.number()])
+    .transform((val) =>
+      typeof val === "number" ? val : Number((val ?? "").split(",").join(".")),
+    )
+    .refine((val) => !Number.isNaN(val) && val > 0, {
+      message: "Informe um valor maior que zero",
+    }),
+});
+
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
+
+function toNumber(value: string | number | null | undefined): number {
+  if (typeof value === "number") return value;
+  return Number((value ?? "").split(",").join("."));
+}
 
 interface CancelOrderDrawerProps extends UseDisclosure {
   order: Api.Order;
@@ -42,6 +64,20 @@ export default function CancelOrderDrawer({
 }: CancelOrderDrawerProps) {
   useOverlayedActive(isOpen);
   const { formatCurrency } = useCurrencyFormatter();
+  const [refund, setRefund] = useState(true);
+
+  const form = useForm<FormInput, unknown, FormValues>({
+    resolver: zodResolver(schema),
+    mode: "onChange",
+    defaultValues: { amount: "" },
+  });
+
+  const rawAmount = useWatch<FormInput>({
+    control: form.control,
+    name: "amount",
+  });
+
+  const amountCents = Math.round(toNumber(rawAmount) * 100);
 
   const { data: options } = useQuery({
     enabled: isOpen,
@@ -51,21 +87,19 @@ export default function CancelOrderDrawer({
     },
   });
 
-  const [refund, setRefund] = useState(true);
-  const [amount, setAmount] = useState<number | null>(null);
-
   const refundableAmount = options?.refundableAmount ?? 0;
-  const amountCents =
-    amount !== null && amount > 0 ? Math.round(amount * 100) : 0;
-  const refundValid = amountCents > 0 && amountCents <= refundableAmount;
   const willRefund = refund && refundableAmount > 0;
+  const refundValid = amountCents > 0 && amountCents <= refundableAmount;
 
+  // Valor padrão: reembolso integral assim que as opções carregam.
   useEffect(() => {
-    if (isOpen && options?.refundableAmount) {
-      setRefund(true);
-      setAmount(options.refundableAmount / 100);
+    if (isOpen && refundableAmount > 0) {
+      form.setValue("amount", refundableAmount / 100, {
+        shouldValidate: true,
+        shouldDirty: false,
+      });
     }
-  }, [isOpen, options]);
+  }, [form, isOpen, refundableAmount]);
 
   const cancel = useMutationAPI({
     mutationFn: async () => {
@@ -161,34 +195,31 @@ export default function CancelOrderDrawer({
                     </Field>
 
                     {willRefund && (
-                      <Field data-invalid={!refundValid && amount !== null}>
-                        <FieldLabel htmlFor="refund-amount">
-                          Valor do reembolso
-                        </FieldLabel>
-                        <CurrencyInput
-                          id="refund-amount"
-                          value={amount ?? ""}
-                          onChange={(value) =>
-                            setAmount(typeof value === "number" ? value : null)
-                          }
-                        />
-                        <FieldDescription
-                          className={cn(
-                            !refundValid &&
-                              amount !== null &&
-                              "text-destructive",
-                          )}
-                        >
-                          {refundValid || amount === null
-                            ? `Máximo: ${formatCurrency(refundableAmount)}`
-                            : `Máximo: ${formatCurrency(refundableAmount)} — valor acima do pago`}
-                        </FieldDescription>
-                      </Field>
+                      <Controller
+                        name="amount"
+                        control={form.control}
+                        render={({ field, fieldState }) => (
+                          <Field data-invalid={fieldState.invalid}>
+                            <FieldLabel htmlFor={field.name}>
+                              Valor do reembolso
+                            </FieldLabel>
+                            <CurrencyInput
+                              {...field}
+                              id={field.name}
+                              aria-invalid={fieldState.invalid}
+                              autoComplete="off"
+                            />
+                            {fieldState.invalid && (
+                              <FieldError errors={[fieldState.error]} />
+                            )}
+                          </Field>
+                        )}
+                      />
                     )}
 
                     <span className="text-xs text-muted-foreground">
                       {willRefund
-                        ? "O pedido será cancelado e o valor reembolsado ao cliente."
+                        ? `O pedido será cancelado e ${formatCurrency(amountCents)} reembolsado ao cliente.`
                         : "O pedido será cancelado e o valor pago fica como crédito para o próximo pedido."}
                     </span>
                   </>

@@ -46,10 +46,22 @@ const adjustment = z.object({
   }),
 });
 
+// Estorno: espelho de uma cobrança (CHARGE) cancelada. Não é dinheiro — só
+// desfaz o efeito da cobrança no saldo. O resolver aplica o sinal negativo.
+const reversal = z.object({
+  ...common,
+  type: z.literal("REVERSAL"),
+  amount: z.number().int().positive(),
+  metadata: z.object({
+    orderId: z.string().min(1),
+  }),
+});
+
 export const createTransactionSchema = z.discriminatedUnion("type", [
   charge,
   payment,
   adjustment,
+  reversal,
 ]);
 export type CreateTransactionProps = z.infer<typeof createTransactionSchema>;
 export type TransactionMetadata = CreateTransactionProps["metadata"];

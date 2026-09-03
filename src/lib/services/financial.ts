@@ -56,6 +56,7 @@ function accumulate(
   } else if (row.type === "ADJUSTMENT" && isRefund(row.metadata)) {
     totals.refunds += row.amount;
   }
+  // REVERSAL (estorno de cobrança) não é dinheiro: entra só no balance.
 }
 
 function finish(totals: FinancialTotals): FinancialTotals {

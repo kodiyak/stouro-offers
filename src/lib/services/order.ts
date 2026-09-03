@@ -185,17 +185,35 @@ export async function markAsCancelled({
   }
 
   const { order } = await db.$transaction(async (tx) => {
-    // Pedido COMPLETED/PAID emitiu CHARGE — remove a cobrança do ledger para
-    // não deixar cobrança fantasma no extrato do cliente.
-    if (existing.status === "COMPLETED" || existing.status === "PAID") {
-      await tx.transaction.deleteMany({
-        where: {
-          targetType: "CUSTOMER",
-          targetId: existing.customerId,
-          type: "CHARGE",
-          metadata: { path: ["orderId"], equals: orderId },
-        },
-      });
+    // Pedido COMPLETED/PAID emitiu CHARGE(s). Transação é fonte da verdade e
+    // nunca é deletada: em vez de remover a cobrança, criamos um REVERSAL
+    // espelhando o valor exato da linha — o par CHARGE + REVERSAL soma zero
+    // no saldo e o histórico fica íntegro. REVERSAL não entra no pool de
+    // créditos da reconciliação (não é dinheiro).
+    const charges = await tx.transaction.findMany({
+      where: {
+        targetType: "CUSTOMER",
+        targetId: existing.customerId,
+        type: "CHARGE",
+        metadata: { path: ["orderId"], equals: orderId },
+      },
+      select: { amount: true },
+    });
+
+    if (charges.length > 0) {
+      const transactionResolver = getTransactionInputResolver("CUSTOMER");
+      for (const charge of charges) {
+        await tx.transaction.create({
+          data: await transactionResolver({
+            amount: charge.amount,
+            targetType: "CUSTOMER",
+            targetId: existing.customerId,
+            description: `Estorno do pedido #${existing.orderNumber}`,
+            type: "REVERSAL",
+            metadata: { orderId },
+          }),
+        });
+      }
     }
 
     if (refund) {

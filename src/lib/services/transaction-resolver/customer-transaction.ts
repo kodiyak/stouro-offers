@@ -7,6 +7,7 @@ import type { TransactionInputResolver } from "./protocol";
  * - CHARGE     → amount positivo  (cobrança emitida: o cliente deve mais)
  * - PAYMENT    → amount negativo  (pagamento recebido: o cliente deve menos)
  * - ADJUSTMENT → sinal livre      (desconto −, taxa/juros +)
+ * - REVERSAL   → amount negativo  (estorno de cobrança: desfaz o CHARGE)
  *
  * O payload (schema) recebe valores em módulo; este resolver aplica o sinal.
  */
@@ -29,7 +30,9 @@ export const customerTransactionResolver: TransactionInputResolver<
   }
 
   const amount =
-    props.type === "PAYMENT" ? -Math.abs(props.amount) : props.amount;
+    props.type === "PAYMENT" || props.type === "REVERSAL"
+      ? -Math.abs(props.amount)
+      : props.amount;
 
   return {
     amount,

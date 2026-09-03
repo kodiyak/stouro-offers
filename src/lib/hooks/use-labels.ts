@@ -22,6 +22,7 @@ export function useLabels() {
     CHARGE: "Cobrança",
     PAYMENT: "Pagamento",
     ADJUSTMENT: "Ajuste",
+    REVERSAL: "Estorno",
   };
 
   const TRANSACTION_TARGET_TYPE: Record<TransactionTargetType, string> = {

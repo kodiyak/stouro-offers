@@ -1,9 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRightIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
+import z from "zod";
 import FormLayout from "@/components/layouts/form-layout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,6 +14,7 @@ import { CurrencyInput } from "@/components/ui/currency-input";
 import {
   Field,
   FieldDescription,
+  FieldError,
   FieldGroup,
   FieldLabel,
   FieldSet,
@@ -26,6 +30,25 @@ const METHOD_LABELS: Record<PaymentMethod, string> = {
   TRANSFER: "Transferência",
 };
 
+const schema = z.object({
+  amount: z
+    .union([z.string(), z.number()])
+    .transform((val) =>
+      typeof val === "number" ? val : Number((val ?? "").split(",").join(".")),
+    )
+    .refine((val) => !Number.isNaN(val) && val > 0, {
+      message: "Informe um valor maior que zero",
+    }),
+});
+
+type FormInput = z.input<typeof schema>;
+type FormValues = z.output<typeof schema>;
+
+function toNumber(value: string | number | null | undefined): number {
+  if (typeof value === "number") return value;
+  return Number((value ?? "").split(",").join("."));
+}
+
 interface RegisterPaymentProps {
   customerId: string;
 }
@@ -33,8 +56,21 @@ interface RegisterPaymentProps {
 export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
   const router = useRouter();
   const { formatCurrency } = useCurrencyFormatter();
-  const [amount, setAmount] = useState<number | null>(null);
   const [method, setMethod] = useState<PaymentMethod>("PIX");
+
+  const form = useForm<FormInput, unknown, FormValues>({
+    resolver: zodResolver(schema),
+    mode: "onChange",
+    defaultValues: { amount: "" },
+  });
+
+  const rawAmount = useWatch<FormInput>({
+    control: form.control,
+    name: "amount",
+  });
+
+  const amountCents = Math.round(toNumber(rawAmount) * 100);
+  const hasAmount = amountCents > 0;
 
   const { data: customer } = useQuery({
     queryKey: ["customers", customerId],
@@ -54,17 +90,13 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
   const receivable = Math.max(0, balance);
   const credit = Math.max(0, -balance);
 
-  const amountCents =
-    amount !== null && amount > 0 ? Math.round(amount * 100) : 0;
-  const isValid = amountCents > 0;
-
   const register = useMutationAPI({
-    mutationFn: async () => {
+    mutationFn: async (data: FormValues) => {
       return api.transactions.createTransaction({
         targetType: "CUSTOMER",
         targetId: customerId,
         type: "PAYMENT",
-        amount: amountCents,
+        amount: Math.round(data.amount * 100),
         description: `Pagamento de ${customer?.name ?? "cliente"}`,
         metadata: { source: "MANUAL", method },
       });
@@ -94,12 +126,12 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
     },
   });
 
+  const { isSubmitting } = form.formState;
+
   return (
     <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        register.mutateAsync();
-      }}
+      onSubmit={form.handleSubmit((data) => register.mutateAsync(data))}
+      noValidate
     >
       <FormLayout
         title={customer?.name ?? "..."}
@@ -119,7 +151,7 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
               size={"lg"}
               type={"submit"}
               className="rounded-full px-4"
-              disabled={!isValid || register.isPending}
+              disabled={!hasAmount || isSubmitting}
             >
               <span className="font-bold">Registrar</span>
               <ArrowRightIcon />
@@ -154,19 +186,27 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
               </Card>
             </div>
 
-            <Field>
-              <FieldLabel htmlFor="payment-amount">Valor recebido</FieldLabel>
-              <CurrencyInput
-                id="payment-amount"
-                value={amount ?? ""}
-                onChange={(value) =>
-                  setAmount(typeof value === "number" ? value : null)
-                }
-              />
-              <FieldDescription>
-                Valor em reais recebido do cliente.
-              </FieldDescription>
-            </Field>
+            <Controller
+              name="amount"
+              control={form.control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Valor recebido</FieldLabel>
+                  <CurrencyInput
+                    {...field}
+                    id={field.name}
+                    aria-invalid={fieldState.invalid}
+                    autoComplete="off"
+                  />
+                  <FieldDescription>
+                    Valor em reais recebido do cliente.
+                  </FieldDescription>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
 
             <Field>
               <FieldLabel>Método de pagamento</FieldLabel>

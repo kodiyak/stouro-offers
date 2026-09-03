@@ -134,6 +134,7 @@ enum TransactionType {
   CHARGE
   PAYMENT
   ADJUSTMENT
+  REVERSAL
 }
 
 model Manifest {

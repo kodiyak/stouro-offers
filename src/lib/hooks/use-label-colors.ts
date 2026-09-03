@@ -17,6 +17,7 @@ export function useLabelColors() {
     CHARGE: "bg-amber-500/15 text-amber-500",
     PAYMENT: "bg-emerald-500/15 text-emerald-500",
     ADJUSTMENT: "bg-sky-500/15 text-sky-500",
+    REVERSAL: "bg-rose-500/15 text-rose-500",
   };
 
   return { ORDER_STATUS, PRODUCT_STATUS, TRANSACTION_TYPE };
