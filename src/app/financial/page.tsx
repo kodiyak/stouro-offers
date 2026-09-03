@@ -22,11 +22,9 @@ export default function Page() {
       className="p-6"
       footer={
         <div className="flex flex-col gap-1">
-          <Button variant={"outline"} size={"drawer"} asChild>
-            <Link href={"/financial/activity"}>
-              <PlusIcon />
-              <span>Registrar Pagamento</span>
-            </Link>
+          <Button variant={"outline"} size={"drawer"}>
+            <PlusIcon />
+            <span>Registrar Pagamento</span>
           </Button>
         </div>
       }
