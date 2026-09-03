@@ -9,6 +9,7 @@ export default function Page() {
     <AppLayout
       title={"Tela Inicial"}
       description="Confira seus pedidos."
+      className="px-0 pt-0"
       footer={
         <div className="flex flex-col gap-1">
           <Button
@@ -25,7 +26,7 @@ export default function Page() {
         </div>
       }
     >
-      <div className="flex flex-col gap-8 py-6">
+      <div className="flex flex-col gap-8">
         <ListOrders />
       </div>
     </AppLayout>

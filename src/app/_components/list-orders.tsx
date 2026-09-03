@@ -56,9 +56,13 @@ export default function ListOrders() {
       onValueChange={(value) => setTab(value as OrderStatus)}
       className="w-full"
     >
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="bg-transparent w-full">
         {STATUSES.map((status) => (
-          <TabsTrigger key={status} value={status}>
+          <TabsTrigger
+            key={status}
+            value={status}
+            className="px-0 data-[state=active]:bg-muted"
+          >
             {labels.ORDER_STATUS[status]}
             <span
               className={cn(
@@ -71,7 +75,7 @@ export default function ListOrders() {
           </TabsTrigger>
         ))}
       </TabsList>
-      <TabsContent value={tab}>
+      <TabsContent value={tab} className="px-6">
         {groupedOrders.length === 0 ? (
           <div className="flex flex-col items-center gap-1 py-16 text-center">
             <span className="text-sm text-muted-foreground">

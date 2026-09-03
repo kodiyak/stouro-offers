@@ -1,5 +1,6 @@
 import type { Api } from "@/lib/clients/api/types";
-import { useCurrencyFormatter, useDateFormatter } from "@/lib/hooks";
+import { useDateFormatter } from "@/lib/hooks";
+import { useCurrencyFormatter } from "@/lib/hooks/use-currency-formatter";
 import { sumBy } from "@/lib/utils";
 
 interface OrderCardProps {
