@@ -103,4 +103,41 @@ export namespace Api {
     refundableAmount: number;
     creditIfNoRefund: number;
   }
+
+  export interface FinancialTotals {
+    balance: number;
+    charged: number;
+    paid: number;
+    refunds: number;
+    receivedNet: number;
+  }
+
+  export interface FinancialCustomerBalance {
+    id: string;
+    name: string;
+    color: string;
+    balance: number;
+  }
+
+  export interface FinancialMonthBalance {
+    month: string; // "yyyy-MM"
+    opening: number;
+    closing: number;
+  }
+
+  export interface FinancialActivityItem extends Api.Transaction {
+    customer: { id: string; name: string; color: string } | null;
+  }
+
+  export interface FinancialOverview {
+    customers: Api.FinancialCustomerBalance[];
+    totals: Api.FinancialTotals;
+  }
+
+  export interface FinancialActivity {
+    month: string;
+    items: Api.FinancialActivityItem[];
+    totals: Api.FinancialTotals;
+    balances: Api.FinancialMonthBalance[];
+  }
 }
