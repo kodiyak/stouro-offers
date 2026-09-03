@@ -2,6 +2,14 @@ import { db } from "@/lib/clients/db";
 import { AppError } from "@/lib/utils/error";
 import type { TransactionInputResolver } from "./protocol";
 
+/**
+ * Convenção contábil do ledger (balance = "a receber" do cliente):
+ * - CHARGE     → amount positivo  (cobrança emitida: o cliente deve mais)
+ * - PAYMENT    → amount negativo  (pagamento recebido: o cliente deve menos)
+ * - ADJUSTMENT → sinal livre      (desconto −, taxa/juros +)
+ *
+ * O payload (schema) recebe valores em módulo; este resolver aplica o sinal.
+ */
 export const customerTransactionResolver: TransactionInputResolver<
   "CUSTOMER"
 > = async (props) => {
@@ -20,8 +28,11 @@ export const customerTransactionResolver: TransactionInputResolver<
     });
   }
 
+  const amount =
+    props.type === "PAYMENT" ? -Math.abs(props.amount) : props.amount;
+
   return {
-    amount: props.amount,
+    amount,
     description: props.description,
     metadata: props.metadata,
     targetType: "CUSTOMER",

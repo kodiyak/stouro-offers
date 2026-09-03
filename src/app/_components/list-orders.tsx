@@ -11,7 +11,7 @@ import { useDateFormatter, useLabelColors, useLabels } from "@/lib/hooks";
 import { cn } from "@/lib/utils";
 import OrderCard from "./order-card";
 
-const STATUSES: OrderStatus[] = ["DRAFT", "PAID", "CANCELLED"];
+const STATUSES: OrderStatus[] = ["DRAFT", "COMPLETED", "PAID", "CANCELLED"];
 
 export default function ListOrders() {
   const { formatDate } = useDateFormatter();
@@ -29,6 +29,7 @@ export default function ListOrders() {
   const counts = useMemo(
     () => ({
       DRAFT: orders.filter((order) => order.status === "DRAFT").length,
+      COMPLETED: orders.filter((order) => order.status === "COMPLETED").length,
       PAID: orders.filter((order) => order.status === "PAID").length,
       CANCELLED: orders.filter((order) => order.status === "CANCELLED").length,
     }),
@@ -55,7 +56,7 @@ export default function ListOrders() {
       onValueChange={(value) => setTab(value as OrderStatus)}
       className="w-full"
     >
-      <TabsList className="grid w-full grid-cols-3">
+      <TabsList className="grid w-full grid-cols-4">
         {STATUSES.map((status) => (
           <TabsTrigger key={status} value={status}>
             {labels.ORDER_STATUS[status]}

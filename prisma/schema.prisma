@@ -51,19 +51,20 @@ enum OrderStatus {
   DRAFT
   CANCELLED
   PAID
+  COMPLETED
 }
 
 model OrderItem {
-  id          String   @id @default(uuid())
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId     String
-  product     Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
-  productId   String
-  name        String
-  price       Int
-  quantity    Int
-  createdAt   DateTime @default(now()) @db.Timestamptz(3)
-  updatedAt   DateTime @updatedAt @db.Timestamptz(3)
+  id        String   @id @default(uuid())
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId   String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Restrict)
+  productId String
+  name      String
+  price     Int
+  quantity  Int
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
 }
 
 model Product {

@@ -1,6 +1,11 @@
 import z from "zod";
 
-export const orderStatusEnum = z.enum(["DRAFT", "PAID", "CANCELLED"]);
+export const orderStatusEnum = z.enum([
+  "DRAFT",
+  "COMPLETED",
+  "PAID",
+  "CANCELLED",
+]);
 export type OrderStatus = z.infer<typeof orderStatusEnum>;
 
 export const productStatusEnum = z.enum(["ACTIVE", "INACTIVE"]);
@@ -11,6 +16,12 @@ export type TransactionType = z.infer<typeof transactionTypeEnum>;
 
 export const TRANSACTION_TARGET_TYPES = ["CUSTOMER"] as const;
 export type TransactionTargetType = (typeof TRANSACTION_TARGET_TYPES)[number];
+
+export const RECONCILIATION_STRATEGIES = ["FIFO", "LIFO"] as const;
+export type ReconciliationStrategy = (typeof RECONCILIATION_STRATEGIES)[number];
+
+export const PAYMENT_METHODS = ["PIX", "CASH", "TRANSFER"] as const;
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const MANIFEST_DOCUMENT_TYPES = ["HANDWRITTEN", "PRINTED"] as const;
 export type ManifestDocumentType = (typeof MANIFEST_DOCUMENT_TYPES)[number];

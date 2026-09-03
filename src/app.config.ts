@@ -9,5 +9,8 @@ export const APP_CONFIG = {
   pdf: {
     filenamePrefix: "paty-pedido",
   },
+  reconciliation: {
+    strategy: "FIFO",
+  },
 } as const;
 export type AppConfig = typeof APP_CONFIG;

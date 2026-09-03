@@ -1,4 +1,4 @@
-import { DollarSignIcon, HistoryIcon, TrashIcon } from "lucide-react";
+import { CheckIcon, HistoryIcon, TrashIcon } from "lucide-react";
 import { useOverlayedActive } from "@/components/providers/overlayed-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,23 +48,23 @@ export default function OrderMoreOptions({
     },
   });
 
-  const paid = useMutationAPI({
-    mutationFn: async () => api.orders.paid({ orderId: order.id }),
+  const complete = useMutationAPI({
+    mutationFn: async () => api.orders.complete({ orderId: order.id }),
     onSuccess: async () => {
       await invalidateQueries(["orders", order.id]);
       onClose();
     },
     toast: {
       loading: () => ({
-        title: "Marcando como pago...",
-        description: "Processando pagamento do pedido.",
+        title: "Concluindo pedido...",
+        description: "Emitindo a cobrança no extrato do cliente.",
       }),
       success: () => ({
-        title: "Pedido marcado como pago!",
-        description: "O pedido foi marcado como pago.",
+        title: "Pedido concluído!",
+        description: "A cobrança foi lançada no extrato do cliente.",
       }),
       error: () => ({
-        title: "Erro ao marcar como pago",
+        title: "Erro ao concluir pedido",
         description: "Tente novamente mais tarde.",
       }),
     },
@@ -83,7 +83,10 @@ export default function OrderMoreOptions({
       }),
       success: () => ({
         title: "Pedido cancelado!",
-        description: "O pedido foi cancelado com sucesso.",
+        description:
+          order.status === "COMPLETED"
+            ? "A cobrança foi estornada do extrato do cliente."
+            : "O pedido foi cancelado com sucesso.",
       }),
       error: () => ({
         title: "Erro ao cancelar pedido",
@@ -107,7 +110,7 @@ export default function OrderMoreOptions({
             order.status === "DRAFT" ? "grid-cols-2" : "grid-cols-1",
           )}
         >
-          {order.status !== "DRAFT" && (
+          {order.status === "CANCELLED" && (
             <Button
               variant="outline"
               size={"drawer"}
@@ -120,16 +123,16 @@ export default function OrderMoreOptions({
           )}
           {order.status === "DRAFT" && (
             <Button
-              onClick={() => paid.mutateAsync()}
-              disabled={paid.isPending}
+              onClick={() => complete.mutateAsync()}
+              disabled={complete.isPending}
               size={"drawer"}
               variant={"outline"}
             >
-              <DollarSignIcon />
-              <span>Marcar como Pago</span>
+              <CheckIcon />
+              <span>Concluir Pedido</span>
             </Button>
           )}
-          {order.status === "DRAFT" && (
+          {(order.status === "DRAFT" || order.status === "COMPLETED") && (
             <Button
               variant="destructive"
               onClick={() => cancel.mutateAsync()}
@@ -139,6 +142,11 @@ export default function OrderMoreOptions({
               <TrashIcon />
               <span>Cancelar</span>
             </Button>
+          )}
+          {order.status === "PAID" && (
+            <p className="px-2 text-center text-sm text-muted-foreground">
+              Pedido pago.
+            </p>
           )}
         </DrawerFooter>
       </DrawerContent>

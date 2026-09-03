@@ -1,7 +1,6 @@
 import type { NextRequest } from "next/server";
 import z from "zod";
-import { db } from "@/lib/clients/db";
-import { getTransactionInputResolver } from "@/lib/services/transaction";
+import { createTransaction } from "@/lib/services/transaction";
 import { isAppError } from "@/lib/utils/error";
 import { createTransactionSchema } from "@/lib/utils/validations/transaction";
 
@@ -15,22 +14,8 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { data } = body;
-  const transactionInputResolver = getTransactionInputResolver(data.targetType);
-
   try {
-    await transactionInputResolver(data);
-    const transaction = await db.transaction.create({
-      data: {
-        amount: data.amount,
-        type: data.type,
-        targetType: data.targetType,
-        targetId: data.targetId,
-        description: data.description,
-        metadata: data.metadata,
-      },
-    });
-
+    const { transaction } = await createTransaction(body.data);
     return Response.json({ transaction });
   } catch (error) {
     if (isAppError(error)) {

@@ -8,6 +8,7 @@ import type {
 export function useLabels() {
   const ORDER_STATUS: Record<OrderStatus, string> = {
     DRAFT: "Rascunho",
+    COMPLETED: "Concluído",
     PAID: "Pago",
     CANCELLED: "Cancelado",
   };

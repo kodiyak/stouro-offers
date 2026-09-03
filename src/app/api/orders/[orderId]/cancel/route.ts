@@ -1,28 +1,28 @@
 import type { NextRequest } from "next/server";
-import { db } from "@/lib/clients/db";
-import { ORDER_ITEM_ORDER_BY } from "@/lib/utils";
+import { markAsCancelled } from "@/lib/services/order";
+import { isAppError } from "@/lib/utils/error";
 
 export async function POST(
   _req: NextRequest,
   { params }: RouteContext<"/api/orders/[orderId]/cancel">,
 ) {
-  const { orderId } = await params;
+  try {
+    const { orderId } = await params;
+    const { order } = await markAsCancelled({ orderId });
+    return Response.json({ order });
+  } catch (error) {
+    if (isAppError(error)) {
+      return Response.json({ error: error.toJSON() }, { status: 400 });
+    }
 
-  const existing = await db.order.findUnique({ where: { id: orderId } });
-
-  if (!existing) {
-    return Response.json({ error: "Order not found" }, { status: 404 });
+    return Response.json(
+      {
+        error: {
+          code: "INTERNAL_SERVER_ERROR",
+          message: "An unexpected error occurred",
+        },
+      },
+      { status: 500 },
+    );
   }
-
-  if (existing.status === "CANCELLED") {
-    return Response.json({ error: "Order already cancelled" }, { status: 400 });
-  }
-
-  const order = await db.order.update({
-    where: { id: orderId },
-    data: { status: "CANCELLED" },
-    include: { items: { orderBy: ORDER_ITEM_ORDER_BY }, customer: true },
-  });
-
-  return Response.json({ order });
 }

@@ -27,9 +27,9 @@ export async function cancel({ orderId }: { orderId: string }) {
     .then((res) => res.data);
 }
 
-export async function paid({ orderId }: { orderId: string }) {
+export async function complete({ orderId }: { orderId: string }) {
   return http
-    .post<{ order: Api.Order }>(`/orders/${orderId}/paid`)
+    .post<{ order: Api.Order }>(`/orders/${orderId}/complete`)
     .then((res) => res.data);
 }
 

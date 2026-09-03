@@ -1,14 +1,14 @@
 import type { NextRequest } from "next/server";
-import { markOrderAsPaid } from "@/lib/services/order";
+import { markAsCompleted } from "@/lib/services/order";
 import { isAppError } from "@/lib/utils/error";
 
 export async function POST(
   _req: NextRequest,
-  { params }: RouteContext<"/api/orders/[orderId]/paid">,
+  { params }: RouteContext<"/api/orders/[orderId]/complete">,
 ) {
   try {
     const { orderId } = await params;
-    const { order } = await markOrderAsPaid({ orderId });
+    const { order } = await markAsCompleted({ orderId });
     return Response.json({ order });
   } catch (error) {
     if (isAppError(error)) {
