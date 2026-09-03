@@ -1,9 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { ListIcon, PlusIcon } from "lucide-react";
+import {
+  ArrowUpFromLineIcon,
+  BanknoteIcon,
+  HandCoinsIcon,
+  ListIcon,
+  PlusIcon,
+  ReceiptTextIcon,
+} from "lucide-react";
 import Link from "next/link";
-import FinancialSummary from "@/components/financial-summary";
+import ActivityMoneyHeader from "@/components/activity-money-header";
 import AppLayout from "@/components/layouts/app-layout";
 import { Button } from "@/components/ui/button";
 import {
@@ -42,9 +49,31 @@ export default function Page() {
           <span className="text-sm text-muted-foreground">Carregando...</span>
         ) : (
           <>
-            <FinancialSummary
-              value={data.totals.balance}
-              totals={data.totals}
+            <ActivityMoneyHeader
+              title="Receita Líquida"
+              value={data.totals.receivedNet}
+              items={[
+                {
+                  label: "A Receber",
+                  icon: <BanknoteIcon className="size-5" />,
+                  value: data.receivable,
+                },
+                {
+                  label: "Créditos",
+                  icon: <HandCoinsIcon className="size-5" />,
+                  value: data.credits,
+                },
+                {
+                  label: "Total cobrado",
+                  icon: <ReceiptTextIcon className="size-5" />,
+                  value: data.totals.charged,
+                },
+                {
+                  label: "Reembolsos",
+                  icon: <ArrowUpFromLineIcon className="size-5" />,
+                  value: data.totals.refunds,
+                },
+              ]}
             />
             <Separator />
             <Link href={"/financial/activity"}>

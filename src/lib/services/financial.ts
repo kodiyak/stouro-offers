@@ -114,7 +114,25 @@ export async function getFinancialOverview() {
     }))
     .sort((a, b) => b.balance - a.balance);
 
-  return { customers: customersWithBalance, totals: finish(totals) };
+  // "A Receber" soma apenas clientes que estão devendo (saldo > 0). Quem tem
+  // crédito não entra — crédito é saldo credor/a pagar, nunca "a receber
+  // negativo".
+  const receivable = customersWithBalance.reduce((acc, customer) => {
+    return customer.balance > 0 ? acc + customer.balance : acc;
+  }, 0);
+
+  // "Créditos" = total de crédito em circulação (soma dos saldos credores,
+  // exibido como valor positivo). Espelho do receivable.
+  const credits = customersWithBalance.reduce((acc, customer) => {
+    return customer.balance < 0 ? acc - customer.balance : acc;
+  }, 0);
+
+  return {
+    customers: customersWithBalance,
+    receivable,
+    credits,
+    totals: finish(totals),
+  };
 }
 
 /**

@@ -131,6 +131,8 @@ export namespace Api {
 
   export interface FinancialOverview {
     customers: Api.FinancialCustomerBalance[];
+    receivable: number;
+    credits: number;
     totals: Api.FinancialTotals;
   }
 
