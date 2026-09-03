@@ -1,6 +1,9 @@
 import { db } from "../clients/db";
+import type { OrderStatus, PaymentGatewayId } from "../enums";
 import { ORDER_ITEM_ORDER_BY } from "../utils";
 import { AppError } from "../utils/error";
+import { isCustomerEligibleForCancellation } from "./customer";
+import { getActivePaymentGateway } from "./payment-gateway";
 import { reconcileCustomerLedger } from "./reconciliation";
 import { getTransactionInputResolver } from "./transaction-resolver";
 
@@ -59,7 +62,82 @@ export async function markAsCompleted({ orderId }: { orderId: string }) {
   return { order };
 }
 
-export async function markAsCancelled({ orderId }: { orderId: string }) {
+export interface CancelOrderRefund {
+  amount: number; // centavos
+}
+
+export interface OrderCancelOptions {
+  orderId: string;
+  status: OrderStatus;
+  amountTotal: number;
+  canCancel: boolean;
+  reason?: string;
+  gateway: PaymentGatewayId;
+  gatewayLabel: string;
+  customerEligible: boolean;
+  /** Valor reembolsável (só quando PAID). */
+  refundableAmount: number;
+  /** Valor que vira crédito do cliente se não reembolsar. */
+  creditIfNoRefund: number;
+}
+
+/**
+ * Detalhes para o usuário configurar o cancelamento antes de confirmar:
+ * status, quanto dá pra reembolsar, gateway ativo (async) e se o cliente
+ * está apto (async).
+ */
+export async function getCancelOptions({
+  orderId,
+}: {
+  orderId: string;
+}): Promise<OrderCancelOptions> {
+  const existing = await db.order.findUnique({ where: { id: orderId } });
+
+  if (!existing) {
+    throw new AppError({
+      code: "INVALID_INPUT",
+      category: "VALIDATION",
+      message: "Order not found",
+      details: { orderId },
+    });
+  }
+
+  const gateway = await getActivePaymentGateway();
+  const customerEligible = await isCustomerEligibleForCancellation({
+    customerId: existing.customerId,
+  });
+  const isPaid = existing.status === "PAID";
+
+  return {
+    orderId: existing.id,
+    status: existing.status,
+    amountTotal: existing.amountTotal,
+    canCancel: existing.status !== "CANCELLED",
+    reason:
+      existing.status === "CANCELLED" ? "Order already cancelled" : undefined,
+    gateway: gateway.id,
+    gatewayLabel: gateway.label,
+    customerEligible,
+    refundableAmount: isPaid ? existing.amountTotal : 0,
+    creditIfNoRefund: isPaid ? existing.amountTotal : 0,
+  };
+}
+
+/**
+ * Cancela um pedido.
+ *
+ * - DRAFT / COMPLETED: remove a cobrança (CHARGE) do ledger se houver.
+ * - PAID: remove a cobrança e, se `refund` for informado, chama o gateway
+ *   ativo e lança um ADJUSTMENT positivo (anula o PAYMENT — reembolso).
+ *   Sem `refund`, o PAYMENT permanece e vira crédito a favor do cliente.
+ */
+export async function markAsCancelled({
+  orderId,
+  refund,
+}: {
+  orderId: string;
+  refund?: CancelOrderRefund;
+}) {
   const existing = await db.order.findUnique({ where: { id: orderId } });
 
   if (!existing) {
@@ -80,19 +158,36 @@ export async function markAsCancelled({ orderId }: { orderId: string }) {
     });
   }
 
-  if (existing.status === "PAID") {
-    throw new AppError({
-      code: "INVALID_INPUT",
-      category: "VALIDATION",
-      message: "Paid orders cannot be cancelled",
-      details: { orderId },
-    });
+  if (refund) {
+    if (existing.status !== "PAID") {
+      throw new AppError({
+        code: "INVALID_INPUT",
+        category: "VALIDATION",
+        message: "Only paid orders can be refunded",
+        details: { orderId, status: existing.status },
+      });
+    }
+
+    if (refund.amount <= 0 || refund.amount > existing.amountTotal) {
+      throw new AppError({
+        code: "INVALID_INPUT",
+        category: "VALIDATION",
+        message: "Refund amount must be between 1 and the order total",
+        details: { orderId, amount: refund.amount },
+      });
+    }
+  }
+
+  // Gateway primeiro (fora da transação): se falhar, nada é alterado.
+  if (refund) {
+    const gateway = await getActivePaymentGateway();
+    await gateway.refund({ orderId, amount: refund.amount });
   }
 
   const { order } = await db.$transaction(async (tx) => {
-    // Pedido COMPLETED emitiu CHARGE — remove a cobrança do ledger para não
-    // deixar cobrança fantasma no extrato do cliente.
-    if (existing.status === "COMPLETED") {
+    // Pedido COMPLETED/PAID emitiu CHARGE — remove a cobrança do ledger para
+    // não deixar cobrança fantasma no extrato do cliente.
+    if (existing.status === "COMPLETED" || existing.status === "PAID") {
       await tx.transaction.deleteMany({
         where: {
           targetType: "CUSTOMER",
@@ -100,6 +195,25 @@ export async function markAsCancelled({ orderId }: { orderId: string }) {
           type: "CHARGE",
           metadata: { path: ["orderId"], equals: orderId },
         },
+      });
+    }
+
+    if (refund) {
+      // ADJUSTMENT positivo anula o PAYMENT correspondente no pool de créditos
+      // (a matemática da reconciliação mantém o saldo consistente).
+      const transactionResolver = getTransactionInputResolver("CUSTOMER");
+      await tx.transaction.create({
+        data: await transactionResolver({
+          amount: refund.amount,
+          targetType: "CUSTOMER",
+          targetId: existing.customerId,
+          description: `Reembolso do pedido #${existing.orderNumber}`,
+          type: "ADJUSTMENT",
+          metadata: {
+            reason: `Reembolso do pedido #${existing.orderNumber}`,
+            orderId,
+          },
+        }),
       });
     }
 

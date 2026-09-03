@@ -40,7 +40,10 @@ const adjustment = z.object({
     .number()
     .int()
     .refine((value) => value !== 0, "amount não pode ser zero"),
-  metadata: z.object({ reason: z.string().min(1) }),
+  metadata: z.object({
+    reason: z.string().min(1),
+    orderId: z.string().optional(),
+  }),
 });
 
 export const createTransactionSchema = z.discriminatedUnion("type", [

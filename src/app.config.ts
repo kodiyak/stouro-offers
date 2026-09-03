@@ -12,5 +12,10 @@ export const APP_CONFIG = {
   reconciliation: {
     strategy: "FIFO",
   },
+  payments: {
+    // Gateway de pagamento ativo. Hoje apenas MANUAL é implementado;
+    // ASAAS/MERCADO_PAGO são boilerplate para o futuro.
+    gateway: "MANUAL",
+  },
 } as const;
 export type AppConfig = typeof APP_CONFIG;

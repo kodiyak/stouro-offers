@@ -21,9 +21,21 @@ export async function getOrder({ orderId }: { orderId: string }) {
     .then((res) => res.data);
 }
 
-export async function cancel({ orderId }: { orderId: string }) {
+export async function cancel({
+  orderId,
+  refund,
+}: {
+  orderId: string;
+  refund?: { amount: number }; // centavos
+}) {
   return http
-    .post<{ order: Api.Order }>(`/orders/${orderId}/cancel`)
+    .post<{ order: Api.Order }>(`/orders/${orderId}/cancel`, { refund })
+    .then((res) => res.data);
+}
+
+export async function getCancelOptions({ orderId }: { orderId: string }) {
+  return http
+    .get<Api.OrderCancelOptions>(`/orders/${orderId}/cancel-options`)
     .then((res) => res.data);
 }
 

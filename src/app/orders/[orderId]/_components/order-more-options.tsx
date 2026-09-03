@@ -11,9 +11,9 @@ import {
 } from "@/components/ui/drawer";
 import { api } from "@/lib/clients/api";
 import type { Api } from "@/lib/clients/api/types";
-import type { UseDisclosure } from "@/lib/hooks";
-import { useMutationAPI } from "@/lib/hooks";
+import { type UseDisclosure, useDisclosure, useMutationAPI } from "@/lib/hooks";
 import { cn, invalidateQueries } from "@/lib/utils";
+import CancelOrderDrawer from "./cancel-order-drawer";
 
 interface OrderMoreOptionsProps extends UseDisclosure {
   order: Api.Order;
@@ -26,6 +26,7 @@ export default function OrderMoreOptions({
   order,
 }: OrderMoreOptionsProps) {
   useOverlayedActive(isOpen);
+  const cancelDrawer = useDisclosure();
   const restore = useMutationAPI({
     mutationFn: async () => api.orders.restore({ orderId: order.id }),
     onSuccess: async () => {
@@ -144,12 +145,18 @@ export default function OrderMoreOptions({
             </Button>
           )}
           {order.status === "PAID" && (
-            <p className="px-2 text-center text-sm text-muted-foreground">
-              Pedido pago.
-            </p>
+            <Button
+              variant="destructive"
+              size={"drawer"}
+              onClick={cancelDrawer.onOpen}
+            >
+              <TrashIcon />
+              <span>Cancelar Pedido</span>
+            </Button>
           )}
         </DrawerFooter>
       </DrawerContent>
+      <CancelOrderDrawer order={order} {...cancelDrawer} />
     </Drawer>
   );
 }

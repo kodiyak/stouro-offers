@@ -1,6 +1,7 @@
 import type {
   ManifestDocumentType,
   OrderStatus,
+  PaymentGatewayId,
   ProductStatus,
   TransactionTargetType,
   TransactionType,
@@ -88,5 +89,18 @@ export namespace Api {
     metadata: TransactionMetadata;
     createdAt: string;
     updatedAt: string;
+  }
+
+  export interface OrderCancelOptions {
+    orderId: string;
+    status: OrderStatus;
+    amountTotal: number;
+    canCancel: boolean;
+    reason?: string;
+    gateway: PaymentGatewayId;
+    gatewayLabel: string;
+    customerEligible: boolean;
+    refundableAmount: number;
+    creditIfNoRefund: number;
   }
 }
