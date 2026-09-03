@@ -4,7 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRightIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import FormLayout from "@/components/layouts/form-layout";
@@ -72,6 +72,13 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
   const amountCents = Math.round(toNumber(rawAmount) * 100);
   const hasAmount = amountCents > 0;
 
+  // Ao entrar na tela o form começa zerado — mesmo quando o Next restaura a
+  // rota do cache sem remontar o componente (o reset pós-submit cobre esse
+  // caso de restauração).
+  useEffect(() => {
+    form.reset();
+  }, [form]);
+
   const { data: customer } = useQuery({
     queryKey: ["customers", customerId],
     queryFn: async () => {
@@ -107,6 +114,7 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
         "financial",
         `customers/${customerId}/ledger`,
       ]);
+      form.reset();
       router.push("/financial");
     },
     toast: {

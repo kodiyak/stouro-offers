@@ -49,7 +49,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
         title={`Pedido ${order ? `#${order.orderNumber}` : "..."}`}
         description={
           <div className="flex items-center gap-2">
-            <span className="text-base text-muted-foreground">
+            <span className="text-xs text-muted-foreground">
               {order?.customer.name ?? "..."}
             </span>
             <Badge className="ml-auto" variant={"secondary"}>
