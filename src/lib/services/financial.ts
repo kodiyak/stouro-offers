@@ -48,7 +48,11 @@ function accumulate(
 ) {
   totals.balance += row.amount;
 
-  if (row.type === "CHARGE") {
+  if (row.type === "CHARGE" || row.type === "REVERSAL") {
+    // Faturamento considera só pedidos válidos: pedido cancelado deixa o par
+    // CHARGE + REVERSAL, então o estorno (negativo) abate a cobrança — e só
+    // afeta o financeiro via reembolso (ADJUSTMENT) ou crédito gerado
+    // (refletido no saldo/balance, não no faturamento).
     totals.charged += row.amount;
   } else if (row.type === "PAYMENT") {
     // PAYMENT é gravado negativo — inverte para exibir o recebido.
@@ -56,7 +60,6 @@ function accumulate(
   } else if (row.type === "ADJUSTMENT" && isRefund(row.metadata)) {
     totals.refunds += row.amount;
   }
-  // REVERSAL (estorno de cobrança) não é dinheiro: entra só no balance.
 }
 
 function finish(totals: FinancialTotals): FinancialTotals {
