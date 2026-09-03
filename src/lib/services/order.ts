@@ -43,7 +43,7 @@ export async function markOrderAsPaid({ orderId }: { orderId: string }) {
         description: `Payment for order ${orderId}`,
         type: "CHARGE",
         metadata: {
-          kind: "MANUAL",
+          reference: `Pedido #${order.orderNumber}`,
         },
       }),
     });

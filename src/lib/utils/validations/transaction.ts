@@ -14,16 +14,21 @@ const common = {
 const charge = z.object({
   ...common,
   type: z.literal("CHARGE"),
-  metadata: z.object({ kind: z.literal("MANUAL") }),
+  metadata: z.object({ reference: z.string().optional() }),
 });
 
 const payment = z.object({
   ...common,
   type: z.literal("PAYMENT"),
-  metadata: z.discriminatedUnion("kind", [
-    z.object({ kind: z.literal("PIX") }),
-    z.object({ kind: z.literal("CASH") }),
-    z.object({ kind: z.literal("TRANSFER") }),
+  metadata: z.discriminatedUnion("source", [
+    z.object({
+      source: z.literal("ORDER"),
+      orderId: z.string().min(1),
+    }),
+    z.object({
+      source: z.literal("MANUAL"),
+      method: z.enum(["PIX", "CASH", "TRANSFER"]),
+    }),
   ]),
 });
 
