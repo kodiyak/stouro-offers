@@ -313,11 +313,16 @@ Transaction  (imutável — fonte da verdade)
 
 ```
  MonthPicker (yyyy-MM, trava no futuro)  →  GET /api/financial/activity?month=
- Balanço do mês (fechamento) + itens do mês (Total cobrado, Reembolsos)
+ Resultado do Mês (destaque)  = pagamentos − reembolsos do mês
+ Total Recebido               = pagamentos que entraram no mês
+ Reembolsos                   = estornos/devoluções do mês
  Saldos mensais: mês selecionado + 3 anteriores (abertura/fechamento)
  Extrato agrupado por dia, mais recente primeiro — cada linha é uma transação:
    ícone + descrição + data · cliente + badge do tipo (Estorno mostra sinal −)
 ```
+
+> O extrato é **movimentação financeira** (entradas/reembolsos). Cobrança
+> (faturamento) fica fora daqui — está no overview da home.
 
 - Janelas de mês calculadas em **America/Sao_Paulo** (UTC−3, sem DST).
 

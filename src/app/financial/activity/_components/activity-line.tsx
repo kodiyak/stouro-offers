@@ -37,10 +37,12 @@ export default function ActivityLine({ item }: ActivityLineProps) {
   const { TRANSACTION_TYPE: COLORS } = useLabelColors();
   const Icon = TYPE_ICONS[item.type];
 
-  // CHARGE/PAYMENT exibem o módulo (o badge já diz o que é). Ajustes e
-  // estornos exibem com sinal — o estorno é uma cobrança cancelada (−).
+  // Ajustes e estornos exibem com sinal (estorno é cobrança cancelada −).
+  // Pagamento é dinheiro entrando → ganha + e verde; cobrança é só fatura
+  // emitida → fica em cinza discreto (não é dinheiro no caixa ainda).
   const showsSign = item.type === "ADJUSTMENT" || item.type === "REVERSAL";
   const value = showsSign ? item.amount : Math.abs(item.amount);
+  const prefix = item.type === "PAYMENT" ? "+" : value < 0 ? "-" : "";
 
   return (
     <div className="flex items-center gap-3 px-4 py-3 border-b last:border-0">
@@ -67,10 +69,13 @@ export default function ActivityLine({ item }: ActivityLineProps) {
       <span
         className={cn(
           "shrink-0 font-mono text-sm font-bold",
+          item.type === "PAYMENT" && "text-emerald-500",
+          item.type === "CHARGE" && "text-muted-foreground",
           showsSign && value < 0 && "text-destructive",
         )}
       >
-        {formatCurrency(value)}
+        {prefix}
+        {formatCurrency(Math.abs(value))}
       </span>
     </div>
   );

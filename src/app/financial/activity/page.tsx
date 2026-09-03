@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { format, startOfDay } from "date-fns";
-import { ArrowUpFromLineIcon, ReceiptTextIcon } from "lucide-react";
+import { ArrowDownToLineIcon, ArrowUpFromLineIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import ActivityMoneyHeader from "@/components/activity-money-header";
 import AppLayout from "@/components/layouts/app-layout";
@@ -54,13 +54,13 @@ export default function Page() {
         ) : (
           <div className="flex flex-col">
             <ActivityMoneyHeader
-              title="Balanço do mês"
-              value={data.balances.at(-1)?.closing ?? data.totals.balance}
+              title="Resultado do Mês"
+              value={data.totals.receivedNet}
               items={[
                 {
-                  label: "Total cobrado",
-                  icon: <ReceiptTextIcon className="size-5" />,
-                  value: data.totals.charged,
+                  label: "Total Recebido",
+                  icon: <ArrowDownToLineIcon className="size-5" />,
+                  value: data.totals.paid,
                 },
                 {
                   label: "Reembolsos",
