@@ -111,49 +111,70 @@ export default function OrderMoreOptions({
             order.status === "DRAFT" ? "grid-cols-2" : "grid-cols-1",
           )}
         >
-          {order.status === "CANCELLED" && (
-            <Button
-              variant="outline"
-              size={"drawer"}
-              onClick={() => restore.mutateAsync()}
-              disabled={restore.isPending}
-            >
-              <HistoryIcon />
-              <span>Restaurar</span>
-            </Button>
-          )}
-          {order.status === "DRAFT" && (
-            <Button
-              onClick={() => complete.mutateAsync()}
-              disabled={complete.isPending}
-              size={"drawer"}
-              variant={"outline"}
-            >
-              <CheckIcon />
-              <span>Concluir Pedido</span>
-            </Button>
-          )}
-          {(order.status === "DRAFT" || order.status === "COMPLETED") && (
-            <Button
-              variant="destructive"
-              onClick={() => cancel.mutateAsync()}
-              disabled={cancel.isPending}
-              size={"drawer"}
-            >
-              <TrashIcon />
-              <span>Cancelar</span>
-            </Button>
-          )}
-          {order.status === "PAID" && (
-            <Button
-              variant="destructive"
-              size={"drawer"}
-              onClick={cancelDrawer.onOpen}
-            >
-              <TrashIcon />
-              <span>Cancelar Pedido</span>
-            </Button>
-          )}
+          {[
+            {
+              label: (
+                <>
+                  <HistoryIcon />
+                  <span>Restaurar</span>
+                </>
+              ),
+              onClick: () => restore.mutateAsync(),
+              disabled: restore.isPending || order.status !== "CANCELLED",
+              variant: "outline" as const,
+              visible: order.status === "CANCELLED",
+            },
+            {
+              label: (
+                <>
+                  <CheckIcon />
+                  <span>Concluir Pedido</span>
+                </>
+              ),
+              onClick: () => complete.mutateAsync(),
+              disabled: complete.isPending || order.status !== "DRAFT",
+              variant: "outline" as const,
+              visible: order.status === "DRAFT",
+            },
+            {
+              label: (
+                <>
+                  <TrashIcon />
+                  <span>Cancelar</span>
+                </>
+              ),
+              onClick: () => cancel.mutateAsync(),
+              disabled:
+                cancel.isPending ||
+                !["DRAFT", "COMPLETED"].includes(order.status),
+              variant: "destructive" as const,
+              visible: ["DRAFT", "COMPLETED"].includes(order.status),
+            },
+            {
+              label: (
+                <>
+                  <TrashIcon />
+                  <span>Cancelar Pedido</span>
+                </>
+              ),
+              onClick: cancelDrawer.onOpen,
+              disabled: false,
+              variant: "destructive" as const,
+              visible: order.status === "PAID",
+            },
+          ]
+            .filter((item) => item.visible)
+            .map((item, index) => (
+              <Button
+                key={`${item.variant}.${index}`}
+                variant={item.variant}
+                onClick={item.onClick}
+                disabled={item.disabled}
+                size={"drawer"}
+              >
+                {item.label}
+              </Button>
+            ))}
         </DrawerFooter>
       </DrawerContent>
       <CancelOrderDrawer order={order} {...cancelDrawer} />

@@ -1,10 +1,8 @@
 import { ArrowLeftIcon } from "lucide-react";
-import { motion } from "motion/react";
 import Link from "next/link";
 import type { PropsWithChildren, ReactNode } from "react";
-import { useOverlayed } from "@/components/providers/overlayed-provider";
-import { standardTransition } from "@/lib/shared";
 import { Button } from "../ui/button";
+import { MotionLayout } from "./motion-layout";
 
 interface FormLayoutProps {
   title: string;
@@ -20,16 +18,8 @@ export default function FormLayout({
   goBack,
   footer,
 }: PropsWithChildren<FormLayoutProps>) {
-  const { isOverlayed } = useOverlayed();
   return (
-    <motion.div
-      className="h-dvh w-dvw overflow-hidden flex flex-col"
-      animate={{
-        scale: isOverlayed ? 0.9 : 1,
-        opacity: isOverlayed ? 0.5 : 1,
-      }}
-      transition={{ ...standardTransition, duration: isOverlayed ? 0.6 : 0.24 }}
-    >
+    <MotionLayout>
       <header className="h-16 border-b flex items-center gap-4">
         <div className="container h-full flex items-center mx-auto px-6">
           {goBack && (
@@ -54,6 +44,6 @@ export default function FormLayout({
       </header>
       <main className="flex-1 overflow-auto px-6 py-2">{children}</main>
       {footer}
-    </motion.div>
+    </MotionLayout>
   );
 }
