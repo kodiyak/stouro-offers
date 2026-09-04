@@ -3,6 +3,7 @@ version: "3.8"
 services:
   postgres:
     image: postgres:13
+    restart: unless-stopped
     environment:
       POSTGRES_USER: aurauser
       POSTGRES_PASSWORD: aurapass
