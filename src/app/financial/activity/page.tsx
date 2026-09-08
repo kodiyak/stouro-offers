@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import AppLayout from "@/components/layouts/app-layout";
+import SkeletonFinancialActivity from "@/components/skeletons/skeleton-financial-activity";
 import ActivityPage from "./_components/activity-page";
 
 export default function Page() {
@@ -10,7 +11,7 @@ export default function Page() {
       className="p-0"
       goBack={"/financial"}
     >
-      <Suspense fallback={"Carregando..."}>
+      <Suspense fallback={<SkeletonFinancialActivity />}>
         <ActivityPage />
       </Suspense>
     </AppLayout>

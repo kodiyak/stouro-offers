@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import FormLayout from "@/components/layouts/form-layout";
+import SkeletonRegisterPayment from "@/components/skeletons/skeleton-register-payment";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { CurrencyInput } from "@/components/ui/currency-input";
@@ -79,7 +80,7 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
     form.reset();
   }, [form]);
 
-  const { data: customer } = useQuery({
+  const { data: customer, isPending: isCustomerPending } = useQuery({
     queryKey: ["customers", customerId],
     queryFn: async () => {
       return api.customers
@@ -88,7 +89,7 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
     },
   });
 
-  const { data: ledger } = useQuery({
+  const { data: ledger, isPending: isLedgerPending } = useQuery({
     queryKey: ["customers", customerId, "ledger"],
     queryFn: () => api.transactions.getLedger({ customerId }),
   });
@@ -135,6 +136,10 @@ export default function RegisterPayment({ customerId }: RegisterPaymentProps) {
   });
 
   const { isSubmitting } = form.formState;
+
+  if (isCustomerPending || isLedgerPending) {
+    return <SkeletonRegisterPayment />;
+  }
 
   return (
     <form

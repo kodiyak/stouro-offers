@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { EllipsisIcon, PlusIcon } from "lucide-react";
 import AppLayout from "@/components/layouts/app-layout";
+import SkeletonOrder from "@/components/skeletons/skeleton-order";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Description } from "@/components/ui/description";
@@ -32,7 +33,7 @@ export default function OrderPage({ orderId }: OrderPageProps) {
 
   const { formatCurrency } = useCurrencyFormatter();
   const { formatDate } = useDateFormatter();
-  const { data: order } = useQuery({
+  const { data: order, isPending } = useQuery({
     queryKey: ["orders", orderId],
     queryFn: async () => {
       return api.orders.getOrder({ orderId }).then((res) => res.order);
@@ -40,6 +41,10 @@ export default function OrderPage({ orderId }: OrderPageProps) {
   });
 
   const isEditable = order?.status === "DRAFT";
+
+  if (isPending && !order) {
+    return <SkeletonOrder />;
+  }
 
   return (
     <>

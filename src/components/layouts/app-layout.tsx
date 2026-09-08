@@ -52,7 +52,9 @@ export default function AppLayout({
           </div>
         </div>
       </header>
-      <main className={cn("flex-1 overflow-auto px-6 py-2", className)}>
+      <main
+        className={cn("flex-1 overflow-auto px-6 py-2 relative", className)}
+      >
         {children}
       </main>
       {footer && <footer className="px-6 py-2 border-t">{footer}</footer>}

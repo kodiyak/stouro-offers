@@ -11,7 +11,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import ActivityMoneyHeader from "@/components/activity-money-header";
+import EmptyCustomers from "@/components/empty/empty-customers";
 import AppLayout from "@/components/layouts/app-layout";
+import SkeletonFinancial from "@/components/skeletons/skeleton-financial";
 import { Button } from "@/components/ui/button";
 import {
   Item,
@@ -46,7 +48,7 @@ export default function Page() {
     >
       <div className="flex flex-col gap-6">
         {isPending || !data ? (
-          <span className="text-sm text-muted-foreground">Carregando...</span>
+          <SkeletonFinancial />
         ) : (
           <>
             <ActivityMoneyHeader
@@ -92,9 +94,7 @@ export default function Page() {
             <Separator />
             <div className="flex flex-col gap-2">
               {data.customers.length === 0 ? (
-                <span className="py-8 text-center text-sm text-muted-foreground">
-                  Nenhum cliente ainda.
-                </span>
+                <EmptyCustomers />
               ) : (
                 data.customers.map((customer) => (
                   <CustomerLine key={customer.id} customer={customer} />

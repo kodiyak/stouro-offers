@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import z from "zod";
 import { useOverlayedActive } from "@/components/providers/overlayed-provider";
+import SkeletonCancelOrder from "@/components/skeletons/skeleton-cancel-order";
 import { Button } from "@/components/ui/button";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import {
@@ -144,9 +145,7 @@ export default function CancelOrderDrawer({
         <FieldSet className="w-full px-4">
           <FieldGroup>
             {!options ? (
-              <span className="text-sm text-muted-foreground">
-                Carregando...
-              </span>
+              <SkeletonCancelOrder />
             ) : !options.canCancel ? (
               <span className="text-sm text-muted-foreground">
                 Este pedido não pode mais ser cancelado.

@@ -15,7 +15,9 @@ import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { Controller, FormProvider, useForm } from "react-hook-form";
 import z from "zod";
+import EmptyProducts from "@/components/empty/empty-products";
 import FormLayout from "@/components/layouts/form-layout";
+import SkeletonCreateOrder from "@/components/skeletons/skeleton-create-order";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -63,7 +65,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
 
   const { isSubmitting, isValid } = form.formState;
 
-  const { data: customer } = useQuery({
+  const { data: customer, isPending: isCustomerPending } = useQuery({
     queryKey: ["customers", customerId],
     queryFn: async () => {
       return api.customers
@@ -72,7 +74,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
     },
   });
 
-  const { data: products = [] } = useQuery({
+  const { data: products = [], isPending: isProductsPending } = useQuery({
     queryKey: ["customers", customerId, "products", "all"],
     queryFn: async () => {
       const products = await api.customers
@@ -165,6 +167,10 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
 
     return () => off();
   }, [form, products]);
+
+  if (isCustomerPending || isProductsPending) {
+    return <SkeletonCreateOrder />;
+  }
 
   return (
     <>
@@ -331,6 +337,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                       )}
                     />
                   ))}
+                  {activeProducts.length === 0 && <EmptyProducts />}
                   <Separator />
                   <button
                     type={"button"}
@@ -352,11 +359,7 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
               <TabsContent value="INACTIVE">
                 <div className="flex flex-col gap-4">
                   {archivedProducts.length === 0 ? (
-                    <div className="flex flex-col items-center gap-1 py-16 text-center">
-                      <span className="text-sm text-muted-foreground">
-                        Nenhum produto arquivado
-                      </span>
-                    </div>
+                    <EmptyProducts />
                   ) : (
                     archivedProducts.map((product) => (
                       <Card className="py-4" key={product.id}>

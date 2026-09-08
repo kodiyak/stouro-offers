@@ -1,9 +1,10 @@
 import { Suspense } from "react";
 import RegisterPayment from "@/components/forms/register-payment";
+import SkeletonRegisterPayment from "@/components/skeletons/skeleton-register-payment";
 
 export default function Page(props: PageProps<"/financial/pay/[customerId]">) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<SkeletonRegisterPayment />}>
       <Pg {...props} />
     </Suspense>
   );

@@ -42,7 +42,7 @@ export default function MonthPicker({
   };
 
   return (
-    <div className="flex items-center gap-2 p-2 border-b">
+    <div className="flex items-center gap-2 p-2 border-b bg-background relative z-20">
       <Button
         size={"icon"}
         variant={"outline"}

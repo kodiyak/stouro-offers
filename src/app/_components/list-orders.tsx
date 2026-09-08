@@ -4,6 +4,8 @@ import { useQuery } from "@tanstack/react-query";
 import { startOfDay } from "date-fns";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import EmptyOrders from "@/components/empty/empty-orders";
+import SkeletonOrders from "@/components/skeletons/skeleton-orders";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/clients/api";
 import type { OrderStatus } from "@/lib/enums";
@@ -17,7 +19,7 @@ export default function ListOrders() {
   const { formatDate } = useDateFormatter();
   const labels = useLabels();
   const { ORDER_STATUS: ORDER_STATUS_COLOR } = useLabelColors();
-  const { data: orders = [] } = useQuery({
+  const { data: orders = [], isPending } = useQuery({
     queryKey: ["orders"],
     queryFn: async () => {
       return api.orders.getOrders().then((res) => res.orders);
@@ -50,6 +52,10 @@ export default function ListOrders() {
     return Object.entries(groups);
   }, [orders, tab]);
 
+  if (isPending) {
+    return <SkeletonOrders />;
+  }
+
   return (
     <Tabs
       value={tab}
@@ -77,11 +83,7 @@ export default function ListOrders() {
       </TabsList>
       <TabsContent value={tab} className="px-6">
         {groupedOrders.length === 0 ? (
-          <div className="flex flex-col items-center gap-1 py-16 text-center">
-            <span className="text-sm text-muted-foreground">
-              Nenhum pedido {labels.ORDER_STATUS[tab].toLowerCase()}
-            </span>
-          </div>
+          <EmptyOrders />
         ) : (
           <div className="flex flex-col gap-8">
             {groupedOrders.map(([date, orders]) => (

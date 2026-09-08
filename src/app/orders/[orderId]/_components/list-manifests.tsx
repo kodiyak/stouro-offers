@@ -1,5 +1,6 @@
 "use client";
 
+import EmptyManifests from "@/components/empty/empty-manifests";
 import type { Api } from "@/lib/clients/api/types";
 import ManifestRow from "./manifest-row";
 
@@ -8,7 +9,7 @@ interface ListManifestsProps {
 }
 
 export default function ListManifests({ manifests }: ListManifestsProps) {
-  if (manifests.length === 0) return null;
+  if (manifests.length === 0) return <EmptyManifests />;
 
   return (
     <div className="flex flex-col gap-2">

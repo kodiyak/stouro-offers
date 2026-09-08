@@ -4,15 +4,17 @@ import { useQuery } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import Link from "next/link";
 import CustomerCard from "@/components/customer-card";
+import EmptyCustomers from "@/components/empty/empty-customers";
 import CreateCustomer from "@/components/forms/create-customer";
 import AppLayout from "@/components/layouts/app-layout";
+import SkeletonCustomers from "@/components/skeletons/skeleton-customers";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/clients/api";
 import { useDisclosure } from "@/lib/hooks";
 
 export default function Page() {
   const create = useDisclosure();
-  const { data: customers = [] } = useQuery({
+  const { data: customers = [], isPending } = useQuery({
     queryKey: ["customers"],
     queryFn: () => api.customers.getCustomers().then((res) => res.customers),
   });
@@ -32,11 +34,17 @@ export default function Page() {
         }
       >
         <div className="grid gap-4">
-          {customers.map((customer) => (
-            <Link href={`/create/${customer.id}`} key={customer.id}>
-              <CustomerCard customer={customer} key={customer.id} />
-            </Link>
-          ))}
+          {isPending ? (
+            <SkeletonCustomers />
+          ) : customers.length === 0 ? (
+            <EmptyCustomers />
+          ) : (
+            customers.map((customer) => (
+              <Link href={`/create/${customer.id}`} key={customer.id}>
+                <CustomerCard customer={customer} key={customer.id} />
+              </Link>
+            ))
+          )}
         </div>
       </AppLayout>
     </>

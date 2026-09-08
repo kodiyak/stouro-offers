@@ -5,7 +5,9 @@ import { startOfDay } from "date-fns";
 import { ArrowDownToLineIcon, ArrowUpFromLineIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import ActivityMoneyHeader from "@/components/activity-money-header";
+import EmptyFinancialActivity from "@/components/empty/empty-financial-activity";
 import MonthPicker from "@/components/month-picker";
+import SkeletonFinancialActivity from "@/components/skeletons/skeleton-financial-activity";
 import { Separator } from "@/components/ui/separator";
 import { api } from "@/lib/clients/api";
 import type { Api } from "@/lib/clients/api/types";
@@ -41,7 +43,7 @@ export default function ActivityPage() {
     <div className="flex flex-col">
       <MonthPicker month={month} onChange={setMonth} />
       {isPending || !data ? (
-        <span className="p-4 text-sm text-muted-foreground">Carregando...</span>
+        <SkeletonFinancialActivity />
       ) : (
         <div className="flex flex-col">
           <ActivityMoneyHeader
@@ -68,11 +70,7 @@ export default function ActivityPage() {
       )}
       <Separator />
       {data && groups.length === 0 ? (
-        <div className="flex flex-col items-center gap-1 py-16 text-center">
-          <span className="text-sm text-muted-foreground">
-            Nenhuma movimentação neste mês.
-          </span>
-        </div>
+        <EmptyFinancialActivity />
       ) : (
         groups.map(([day, items]) => (
           <div key={day} className="flex flex-col">
