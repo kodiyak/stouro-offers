@@ -14,6 +14,7 @@ import {
 import type { Api } from "@/lib/clients/api/types";
 import { useCurrencyFormatter } from "@/lib/hooks/use-currency-formatter";
 import { cn } from "@/lib/utils";
+import { getAvatarUrl } from "@/lib/utils/avatar";
 
 interface CustomerLineProps {
   customer: Api.FinancialCustomerBalance;
@@ -29,7 +30,7 @@ export default function CustomerLine({ customer }: CustomerLineProps) {
     <Item variant={"outline"}>
       <ItemMedia>
         <Image
-          src={`https://avatar.vercel.sh/${customer.name}`}
+          src={getAvatarUrl(customer.name)}
           alt={customer.name}
           width={64}
           height={64}

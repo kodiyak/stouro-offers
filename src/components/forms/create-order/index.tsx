@@ -334,7 +334,12 @@ export default function CreateOrder({ customerId }: CreateOrderProps) {
                   <Separator />
                   <button
                     type={"button"}
-                    className="p-2 rounded-xl text-muted-foreground border-2 bg-card border-dashed aspect-video flex flex-col items-center justify-center gap-4"
+                    className={cn(
+                      "p-2 rounded-xl text-muted-foreground border-2 bg-card border-dashed aspect-video flex flex-col items-center justify-center gap-4",
+                      "transition-all",
+                      createProduct.isOpen &&
+                        "scale-98 border-primary bg-primary/10 text-primary",
+                    )}
                     onClick={createProduct.onOpen}
                   >
                     <PlusCircleIcon className="size-12" />

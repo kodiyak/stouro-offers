@@ -1,10 +1,10 @@
 import Image from "next/image";
 import type { Api } from "@/lib/clients/api/types";
+import { getAvatarUrl } from "@/lib/utils/avatar";
 import {
   Item,
   ItemContent,
   ItemDescription,
-  ItemHeader,
   ItemMedia,
   ItemTitle,
 } from "./ui/item";
@@ -18,7 +18,7 @@ export default function CustomerCard({ customer }: CustomerCardProps) {
     <Item variant="outline" className="rounded-xl p-2 gap-2.5 bg-card">
       <ItemMedia>
         <Image
-          src={`https://avatar.vercel.sh/${customer.name}`}
+          src={getAvatarUrl(customer.name)}
           alt={customer.name}
           width={64}
           height={64}

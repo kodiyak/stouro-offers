@@ -5,7 +5,12 @@ const nextConfig: NextConfig = {
   /* config options here */
   cacheComponents: true,
   images: {
-    remotePatterns: [new URL("https://avatar.vercel.sh/**")],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "avatar.vercel.sh",
+      },
+    ],
   },
   serverExternalPackages: ["@serwist/turbopack", "esbuild-wasm"],
 };
